@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NXT CORE | USER MANAGER</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        body {
+            background: radial-gradient(circle at 20% 30%, #03050b, #000000);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .card {
+            background: rgba(0, 20, 30, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid cyan;
+            border-radius: 48px;
+            padding: 40px 32px;
+            width: 100%;
+            max-width: 500px;
+        }
+        h2 {
+            color: cyan;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 14px 18px;
+            background: #000000aa;
+            border: 1px solid cyan;
+            border-radius: 40px;
+            color: white;
+        }
+        .task-buttons {
+            display: flex;
+            gap: 14px;
+            margin: 20px 0;
+        }
+        .task-btn {
+            flex: 1;
+            padding: 12px;
+            background: #0ff1;
+            border: 1px solid cyan;
+            border-radius: 60px;
+            color: white;
+            cursor: pointer;
+            text-align: center;
+        }
+        .task-btn.active {
+            background: cyan;
+            color: black;
+            font-weight: bold;
+            box-shadow: 0 0 12px cyan;
+        }
+        .create-btn {
+            width: 100%;
+            padding: 14px;
+            background: #333;
+            border: none;
+            border-radius: 60px;
+            color: #888;
+            cursor: not-allowed;
+            margin-top: 12px;
+        }
+        .create-btn.active {
+            background: cyan;
+            color: black;
+            cursor: pointer;
+            box-shadow: 0 0 12px cyan;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 24px;
+            color: cyan;
+            text-decoration: none;
+        }
+        .toast {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0a6;
+            padding: 12px 24px;
+            border-radius: 60px;
+            color: white;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>🔐 USER MANAGER — ZETSU ONLY</h2>
+    <div class="input-group">
+        <input type="text" id="usernameInput" placeholder="Username">
+    </div>
+    <div class="input-group">
+        <input type="text" id="passwordInput" placeholder="Password">
+    </div>
+    <div class="task-buttons">
+        <div class="task-btn" data-task="add">➕ TAMBAH AKUN</div>
+        <div class="task-btn" data-task="delete">🗑 HAPUS AKUN</div>
+    </div>
+    <button id="createBtn" class="create-btn">⚡ CREATE ⚡</button>
+    <a href="dashboard.html" class="back-link">← Kembali ke Dashboard</a>
+</div>
+<div id="toastMsg" class="toast"></div>
+
+<script>
+    let currentUser = JSON.parse(localStorage.getItem("nxt_user") || "{}");
+    if (!currentUser || currentUser.username !== "zetsu") {
+        alert("⛔ Hanya user ZETSU yang bisa mengakses halaman ini!");
+        window.location.href = "dashboard.html";
+    }
+
+    let selectedTask = null;
+    const taskBtns = document.querySelectorAll(".task-btn");
+    const createBtn = document.getElementById("createBtn");
+
+    function loadUsers() {
+        let raw = localStorage.getItem("nxt_core_users");
+        if (!raw) {
+            let defaultUsers = [
+                { username: "zetsu", password: "QuantumTeams", role: "OWNER" },
+                { username: "admin", password: "admin123", role: "ADMIN" },
+                { username: "user", password: "user123", role: "USER" }
+            ];
+            localStorage.setItem("nxt_core_users", JSON.stringify(defaultUsers));
+            return defaultUsers;
+        }
+        return JSON.parse(raw);
+    }
+
+    function saveUsers(users) {
+        localStorage.setItem("nxt_core_users", JSON.stringify(users));
+    }
+
+    function showToast(msg, isError = false) {
+        let toast = document.getElementById("toastMsg");
+        toast.innerText = msg;
+        toast.style.background = isError ? "#a22" : "#0a6";
+        toast.style.display = "block";
+        setTimeout(() => toast.style.display = "none", 2500);
+    }
+
+    taskBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            taskBtns.forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            selectedTask = btn.getAttribute("data-task");
+            createBtn.classList.add("active");
+        });
+    });
+
+    createBtn.addEventListener("click", () => {
+        if (!selectedTask) {
+            showToast("Pilih tugas dulu (TAMBAH AKUN / HAPUS AKUN)!", true);
+            return;
+        }
+
+        let username = document.getElementById("usernameInput").value.trim();
+        let password = document.getElementById("passwordInput").value.trim();
+        let users = loadUsers();
+
+        if (selectedTask === "add") {
+            if (!username) { showToast("Isi username mas!", true); return; }
+            if (!password) { showToast("Isi password mas!", true); return; }
+            if (users.find(u => u.username === username)) { showToast("Username sudah ada!", true); return; }
+            users.push({ username, password, role: "USER" });
+            saveUsers(users);
+            showToast(`✅ Akun ${username} berhasil ditambahkan`);
+            document.getElementById("usernameInput").value = "";
+            document.getElementById("passwordInput").value = "";
+        } 
+        else if (selectedTask === "delete") {
+            if (!username) { showToast("Isi username mas!", true); return; }
+            let userIndex = users.findIndex(u => u.username === username);
+            if (userIndex === -1) { showToast("Tidak Ada Data User", true); return; }
+            if (users[userIndex].username === "zetsu") { showToast("❌ Akun ZETSU tidak boleh dihapus!", true); return; }
+            users.splice(userIndex, 1);
+            saveUsers(users);
+            showToast(`🗑 Akun ${username} berhasil dihapus`);
+            document.getElementById("usernameInput").value = "";
+            document.getElementById("passwordInput").value = "";
+        }
+
+        selectedTask = null;
+        taskBtns.forEach(b => b.classList.remove("active"));
+        createBtn.classList.remove("active");
+    });
+</script>
+</body>
+</html>
