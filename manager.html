@@ -55,7 +55,7 @@
     
     let selectedRole = null, selectedTimer = null;
     
-    function loadUsers() { let raw = localStorage.getItem("nxt_core_users"); if (!raw) { let defaultUsers = [{ username: "zetsu", password: "QuantumTeams", role: "OWNER", timer: "unlimited" }]; localStorage.setItem("nxt_core_users", JSON.stringify(defaultUsers)); return defaultUsers; } return JSON.parse(raw); }
+    function loadUsers() { let raw = localStorage.getItem("nxt_core_users"); if (!raw) { let defaultUsers = [{ username: "zetsu", password: "zetsu123", role: "OWNER", timer: "unlimited" }]; localStorage.setItem("nxt_core_users", JSON.stringify(defaultUsers)); return defaultUsers; } return JSON.parse(raw); }
     function saveUsers(users) { localStorage.setItem("nxt_core_users", JSON.stringify(users)); renderUserList(); }
     function showToast(msg, isError = false) { let toast = document.getElementById("toastMsg"); toast.innerText = msg; toast.style.background = isError ? "#a22" : "#0a6"; toast.style.display = "block"; setTimeout(() => toast.style.display = "none", 2500); }
     function renderUserList() { let users = loadUsers(); let container = document.getElementById("userList"); container.innerHTML = users.map(u => `<div class="user-item"><span>👤 ${u.username} (${u.role}) - ⏱️ ${u.timer}</span></div>`).join(''); }
