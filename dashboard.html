@@ -5,260 +5,132 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NXT CORE v2 | DASHBOARD</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', system-ui, sans-serif;
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+        body { background: #010101; color: #ccc; padding: 20px; }
+        .container { max-width: 1400px; margin: auto; }
+        .navbar {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #0a0e17cc; backdrop-filter: blur(12px); border: 1px solid cyan;
+            border-radius: 80px; padding: 12px 28px; margin-bottom: 30px; flex-wrap: wrap;
         }
-        body {
-            background: #010101;
-            color: #ccc;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1400px;
-            margin: auto;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid cyan;
-            padding-bottom: 12px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-        .badge-user {
-            background: #0ff1;
-            padding: 8px 18px;
-            border-radius: 30px;
-            font-size: 14px;
-        }
-        .btn-logout {
-            background: #a00;
-            border: none;
-            padding: 8px 18px;
-            border-radius: 30px;
-            color: white;
-            cursor: pointer;
-        }
-        .grid-2 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-            gap: 26px;
-            margin-bottom: 30px;
-        }
-        .card {
-            background: #0a0e17cc;
-            backdrop-filter: blur(8px);
-            border: 1px solid #0ff3;
-            border-radius: 32px;
-            padding: 22px;
-        }
-        .card h3 {
-            color: cyan;
-            margin-bottom: 18px;
-            border-left: 4px solid cyan;
-            padding-left: 12px;
-        }
-        input, select {
-            width: 100%;
-            padding: 12px;
-            background: #000000aa;
-            border: 1px solid cyan;
-            border-radius: 30px;
-            color: white;
-            margin: 8px 0 16px;
-        }
-        .btn-primary {
-            background: cyan;
-            color: black;
-            font-weight: bold;
-            width: 100%;
-            padding: 12px;
-            border-radius: 30px;
-            border: none;
-            cursor: pointer;
-        }
-        .history-item {
-            background: #0ff1;
-            margin: 12px 0;
-            padding: 12px;
-            border-radius: 20px;
-            border-left: 3px solid cyan;
-        }
-        .result-box {
-            background: #00000099;
-            border-radius: 20px;
-            padding: 15px;
-            margin-top: 15px;
-        }
-        .manager-link {
-            display: inline-block;
-            margin-top: 20px;
-            color: cyan;
-            text-decoration: none;
-            border: 1px solid cyan;
-            padding: 6px 16px;
-            border-radius: 60px;
-        }
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            font-size: 11px;
-            opacity: 0.5;
-        }
-        @media (max-width: 700px) {
-            .grid-2 { grid-template-columns: 1fr; }
-        }
+        .logo { display: flex; align-items: center; gap: 10px; }
+        .logo-img { width: 40px; border-radius: 50%; }
+        .logo span { color: cyan; font-weight: bold; font-size: 20px; }
+        .nav-links { display: flex; gap: 24px; flex-wrap: wrap; }
+        .nav-links a { color: white; text-decoration: none; cursor: pointer; }
+        .nav-links a:hover, .nav-links a.active { color: cyan; text-shadow: 0 0 5px cyan; }
+        .user-info { display: flex; gap: 16px; align-items: center; }
+        .badge-user { background: #0ff1; padding: 6px 16px; border-radius: 60px; font-size: 13px; }
+        .btn-logout { background: #a00; border: none; padding: 6px 16px; border-radius: 60px; color: white; cursor: pointer; }
+        .section { display: none; animation: fade 0.3s ease; }
+        .section.active { display: block; }
+        @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 26px; }
+        .card { background: #0a0e17cc; backdrop-filter: blur(8px); border: 1px solid cyan; border-radius: 32px; padding: 22px; }
+        .card h3 { color: cyan; margin-bottom: 18px; border-left: 4px solid cyan; padding-left: 12px; }
+        input, select { width: 100%; padding: 12px; background: black; border: 1px solid cyan; border-radius: 30px; color: white; margin: 8px 0 16px; }
+        .btn-primary { background: cyan; color: black; font-weight: bold; width: 100%; padding: 12px; border-radius: 30px; border: none; cursor: pointer; }
+        .history-item { background: #0ff1; margin: 12px 0; padding: 12px; border-radius: 20px; border-left: 3px solid cyan; }
+        .result-box { background: #00000099; border-radius: 20px; padding: 15px; margin-top: 15px; }
+        .vip-card { background: #0ff2; border: 1px solid gold; margin-top: 20px; }
+        .manager-link { display: inline-block; margin-top: 12px; color: cyan; text-decoration: none; border: 1px solid cyan; padding: 6px 16px; border-radius: 60px; }
+        .plans-container { display: flex; flex-direction: column; gap: 16px; }
+        .plan-card { background: #0ff1; padding: 16px; border-radius: 24px; }
+        footer { text-align: center; margin-top: 40px; font-size: 11px; opacity: 0.5; }
+        @media (max-width: 700px) { .navbar { flex-direction: column; gap: 12px; } .nav-links { justify-content: center; } }
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="header">
-        <h2 style="color:cyan">⎋ NXT CORE v2 — FORENSIC SUITE</h2>
-        <div class="badge-user" id="userInfo">Loading...</div>
-        <button class="btn-logout" onclick="logout()">⟡ LOGOUT ⟡</button>
-    </div>
-
-    <div class="grid-2">
-        <!-- BUG SENDER + RIWAYAT -->
-        <div class="card">
-            <h3>🐛 BUG SENDER</h3>
-            <input type="text" id="bugTarget" placeholder="Nomor target (628xxx)">
-            <select id="bugTypeSelect">
-                <option>CRASH WA</option><option>FORCLOSE</option><option>DELAY INVISIBLE</option>
-                <option>DELAY HARD</option><option>ONE MSG FC</option><option>BLANK</option>
-            </select>
-            <button class="btn-primary" onclick="sendBug()">⟡ SEND BUG ⟡</button>
-            <div style="margin-top: 20px;"><h4>📜 RIWAYAT BUG</h4>
-                <div id="historyList">Belum ada riwayat</div>
-                <button onclick="clearHistory()" style="margin-top: 12px; background:#333; padding:8px; border-radius:30px; border:none; color:white;">🗑 HAPUS RIWAYAT</button>
-            </div>
+    <div class="navbar">
+        <div class="logo">
+            <img class="logo-img" src="https://g.top4top.io/p_375539rhi0.jpg" alt="Logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'45\' fill=\'cyan\'/%3E%3Ctext x=\'50\' y=\'67\' text-anchor=\'middle\' fill=\'black\' font-size=\'40\'%3ENX%3C/text%3E%3C/svg%3E'">
+            <span>⎋ NXT CORE v2</span>
         </div>
-
-        <!-- IP TRACKER -->
-        <div class="card">
-            <h3>🌐 IP TRACKER</h3>
-            <input type="text" id="ipTarget" placeholder="IP target / kosongkan = IP sendiri">
-            <button class="btn-primary" onclick="trackIP()">⟡ LACAK IP ⟡</button>
-            <div id="ipResult" class="result-box" style="display:none;"></div>
+        <div class="nav-links">
+            <a class="nav-link active" data-section="home">Home</a>
+            <a class="nav-link" data-section="bug">Bug</a>
+            <a class="nav-link" data-section="iptracker">IP Tracker</a>
+            <a class="nav-link" data-section="plans">Plans</a>
+            <a class="nav-link" data-section="about">About</a>
         </div>
-
-        <!-- NUMBER TRACKER -->
-        <div class="card">
-            <h3>📞 NUMBER TRACKER</h3>
-            <input type="text" id="phoneNumber" placeholder="Masukkan nomor hp (628xxx)">
-            <button class="btn-primary" onclick="trackPhone()">⟡ LACAK NOMOR ⟡</button>
-            <div id="phoneResult" class="result-box" style="display:none;"></div>
+        <div class="user-info">
+            <span class="badge-user" id="userInfo">Loading...</span>
+            <button class="btn-logout" onclick="logout()">⟡ LOGOUT ⟡</button>
         </div>
     </div>
 
-    <!-- MANAGER LINK (HANYA UNTUK ZETSU) -->
-    <div id="managerLink" style="text-align:center; margin-bottom:20px;"></div>
+    <div id="home" class="section active">
+        <div class="card" style="text-align:center">
+            <h3>🔥 WELCOME TO NXT CORE v2</h3>
+            <p>Full forensic suite: Bug Sender, IP Tracker, Number Tracker.</p>
+            <div id="managerLink"></div>
+            <div id="vipSection"></div>
+        </div>
+    </div>
 
+    <div id="bug" class="section"><div class="card"><h3>🐛 BUG SENDER</h3>
+        <input type="text" id="bugTarget" placeholder="Nomor target (628xxx)">
+        <select id="bugTypeSelect"><option>CRASH WA</option><option>FORCLOSE</option><option>DELAY INVISIBLE</option><option>DELAY HARD</option><option>ONE MSG FC</option><option>BLANK</option></select>
+        <button class="btn-primary" onclick="sendBug()">⟡ SEND BUG ⟡</button>
+        <div style="margin-top:20px;"><h4>📜 RIWAYAT BUG</h4><div id="historyList"></div><button onclick="clearHistory()" style="margin-top:12px; background:#333; padding:8px; border-radius:30px;">🗑 HAPUS RIWAYAT</button></div>
+    </div></div>
+
+    <div id="iptracker" class="section"><div class="card"><h3>🌐 IP TRACKER</h3>
+        <input type="text" id="ipTarget" placeholder="IP target / kosongkan = IP sendiri">
+        <button class="btn-primary" onclick="trackIP()">⟡ LACAK IP ⟡</button>
+        <div id="ipResult" class="result-box" style="display:none;"></div>
+    </div>
+    <div class="card" style="margin-top:20px"><h3>📞 NUMBER TRACKER</h3>
+        <input type="text" id="phoneNumber" placeholder="Masukkan nomor hp (628xxx)">
+        <button class="btn-primary" onclick="trackPhone()">⟡ LACAK NOMOR ⟡</button>
+        <div id="phoneResult" class="result-box" style="display:none;"></div>
+    </div></div>
+
+    <div id="plans" class="section"><div class="card"><h3>💎 MEMBERSHIP PLANS</h3>
+        <div class="plans-container"><div class="plan-card">🔥 BASIC USER — Rp25.000</div><div class="plan-card">⚡ RESELLER — Rp60.000</div><div class="plan-card">👑 ADMIN USER — Rp100.000</div></div>
+        <p style="margin-top:12px">Hubungi @SyallOfficial untuk pembelian.</p>
+    </div></div>
+
+    <div id="about" class="section"><div class="card"><h3>📌 ABOUT NXT CORE</h3><p>Platform forensic digital untuk bug simulation, IP tracking, dan number lookup.</p><p>© 2025 NXT CORE v2 — ZETSU PROJECT</p></div></div>
     <footer>NXT CORE v2 — All trackers + bug simulation (riwayat lokal)</footer>
 </div>
 
 <script>
-    // ========== SESSION & LOGOUT ==========
     let currentUser = null;
     function loadSession() {
         let raw = localStorage.getItem("nxt_user");
         if (!raw) { window.location.href = "index.html"; return; }
         currentUser = JSON.parse(raw);
         document.getElementById("userInfo").innerHTML = `👤 ${currentUser.username} (${currentUser.role})`;
-
-        // Tampilkan link manager hanya untuk zetsu
         let managerDiv = document.getElementById("managerLink");
+        let vipDiv = document.getElementById("vipSection");
         if (currentUser.username === "zetsu") {
             managerDiv.innerHTML = `<a href="manager.html" class="manager-link">🔧 USER MANAGER (ZETSU ONLY)</a>`;
+            vipDiv.innerHTML = `<div class="card vip-card" style="margin-top:20px; text-align:center;"><h3>⭐ ROLE'S VVIP</h3><p>Reseller → bisa create USER</p><p>Partner → bisa create USER + RESELLER</p><p>Owner → bisa create USER + RESELLER + PARTNER</p><p>⏱️ Timer: 1 day, 1 week, 1 month, 2 month, unlimited</p></div>`;
         } else {
             managerDiv.innerHTML = "";
+            vipDiv.innerHTML = "";
         }
     }
+    function logout() { localStorage.removeItem("nxt_user"); window.location.href = "index.html"; }
 
-    function logout() {
-        localStorage.removeItem("nxt_user");
-        window.location.href = "index.html";
-    }
+    const sections = ["home","bug","iptracker","plans","about"];
+    function showSection(id) { sections.forEach(sec => document.getElementById(sec).classList.remove("active")); document.getElementById(id).classList.add("active"); document.querySelectorAll(".nav-link").forEach(link => link.classList.remove("active")); document.querySelector(`.nav-link[data-section="${id}"]`).classList.add("active"); }
+    document.querySelectorAll(".nav-link").forEach(link => link.addEventListener("click", (e) => { e.preventDefault(); showSection(link.getAttribute("data-section")); }));
 
-    // ========== RIWAYAT BUG ==========
     let bugHistory = [];
-    function loadHistory() {
-        let h = localStorage.getItem("nxt_bug_history_v2");
-        bugHistory = h ? JSON.parse(h) : [];
-        renderHistory();
-    }
-    function saveHistory() {
-        localStorage.setItem("nxt_bug_history_v2", JSON.stringify(bugHistory.slice(0, 30)));
-        renderHistory();
-    }
-    function renderHistory() {
-        let div = document.getElementById("historyList");
-        if (!bugHistory.length) { div.innerHTML = "Belum ada riwayat"; return; }
-        div.innerHTML = bugHistory.map(h => `<div class="history-item">📱 ${h.target}<br>🐞 ${h.bug}<br>🕒 ${h.waktu}</div>`).join('');
-    }
-    function addHistory(target, bug) {
-        bugHistory.unshift({ target, bug, waktu: new Date().toLocaleString() });
-        saveHistory();
-    }
-    function clearHistory() {
-        bugHistory = [];
-        saveHistory();
-    }
+    function loadHistory() { let h = localStorage.getItem("nxt_bug_history_v2"); bugHistory = h ? JSON.parse(h) : []; renderHistory(); }
+    function renderHistory() { let div = document.getElementById("historyList"); if (!bugHistory.length) { div.innerHTML = "Belum ada riwayat"; return; } div.innerHTML = bugHistory.map(h => `<div class="history-item">📱 ${h.target}<br>🐞 ${h.bug}<br>🕒 ${h.waktu}</div>`).join(''); }
+    function saveHistory() { localStorage.setItem("nxt_bug_history_v2", JSON.stringify(bugHistory.slice(0,30))); renderHistory(); }
+    function addHistory(target, bug) { bugHistory.unshift({ target, bug, waktu: new Date().toLocaleString() }); saveHistory(); }
+    function clearHistory() { bugHistory = []; saveHistory(); }
+    function sendBug() { let target = document.getElementById("bugTarget").value.trim(); let bug = document.getElementById("bugTypeSelect").value; if (!target) { alert("Isi nomor target dulu."); return; } if (!/^[0-9+]+$/.test(target)) { alert("Goblok ada huruf nya tolol!"); return; } addHistory(target, bug); alert(`✅ Success Sending bug ${bug} ke ${target}`); document.getElementById("bugTarget").value = ""; }
 
-    // ========== SEND BUG ==========
-    function sendBug() {
-        let target = document.getElementById("bugTarget").value.trim();
-        let bug = document.getElementById("bugTypeSelect").value;
-        if (!target) { alert("Isi nomor target dulu."); return; }
-        if (!/^[0-9+]+$/.test(target)) { alert("Goblok ada huruf nya tolol!"); return; }
-        addHistory(target, bug);
-        alert(`✅ Success Sending bug ${bug} ke ${target}`);
-        document.getElementById("bugTarget").value = "";
-    }
+    async function trackIP() { let ip = document.getElementById("ipTarget").value.trim(); let url = ip ? `https://ipapi.co/${ip}/json/` : `https://ipapi.co/json/`; let resDiv = document.getElementById("ipResult"); resDiv.style.display = "block"; resDiv.innerHTML = "⏳ Melacak IP..."; try { let resp = await fetch(url); let data = await resp.json(); if (data.error) throw new Error(); resDiv.innerHTML = `<b>🌍 IP:</b> ${data.ip}<br><b>📍 Kota:</b> ${data.city || '-'}<br><b>🗺 Wilayah:</b> ${data.region || '-'}<br><b>🌎 Negara:</b> ${data.country_name || '-'}<br><b>📡 ISP:</b> ${data.org || '-'}`; } catch(e) { resDiv.innerHTML = "❌ Gagal lacak IP."; } }
+    async function trackPhone() { let phone = document.getElementById("phoneNumber").value.trim(); let resDiv = document.getElementById("phoneResult"); if (!phone) { alert("Masukkan nomor target!"); return; } resDiv.style.display = "block"; resDiv.innerHTML = "⏳ Melacak nomor..."; let demoMap = { "628123456789": { provider: "Telkomsel", region: "Sulawesi Selatan", city: "Makassar" } }; if (demoMap[phone]) { let d = demoMap[phone]; resDiv.innerHTML = `📞 Nomor: ${phone}<br>📡 Provider: ${d.provider}<br>🗺 Wilayah: ${d.region}<br>🏙 Kota: ${d.city}`; } else { resDiv.innerHTML = `⚠️ Data nomor ${phone} tidak ditemukan.<br>💡 Contoh: 628123456789 → Sulawesi Selatan.`; } }
 
-    // ========== IP TRACKER ==========
-    async function trackIP() {
-        let ip = document.getElementById("ipTarget").value.trim();
-        let url = ip ? `https://ipapi.co/${ip}/json/` : `https://ipapi.co/json/`;
-        let resDiv = document.getElementById("ipResult");
-        resDiv.style.display = "block";
-        resDiv.innerHTML = "⏳ Melacak IP...";
-        try {
-            let resp = await fetch(url);
-            let data = await resp.json();
-            if (data.error) throw new Error("IP invalid");
-            resDiv.innerHTML = `<b>🌍 IP:</b> ${data.ip}<br><b>📍 Kota:</b> ${data.city || '-'}<br><b>🗺 Wilayah:</b> ${data.region || '-'}<br><b>🌎 Negara:</b> ${data.country_name || '-'}<br><b>📡 ISP:</b> ${data.org || '-'}<br><b>⏰ Waktu:</b> ${new Date().toLocaleString()}`;
-        } catch(e) {
-            resDiv.innerHTML = "❌ Gagal lacak IP. Coba lagi.";
-        }
-    }
-
-    // ========== NUMBER TRACKER ==========
-    async function trackPhone() {
-        let phone = document.getElementById("phoneNumber").value.trim();
-        let resDiv = document.getElementById("phoneResult");
-        if (!phone) { alert("Masukkan nomor target!"); return; }
-        resDiv.style.display = "block";
-        resDiv.innerHTML = "⏳ Melacak nomor...";
-        let demoMap = {
-            "628123456789": { provider: "Telkomsel", region: "Sulawesi Selatan", city: "Makassar" },
-            "628219876543": { provider: "Indosat", region: "Jawa Timur", city: "Surabaya" },
-            "628577890123": { provider: "XL", region: "Sulawesi Utara", city: "Manado" }
-        };
-        if (demoMap[phone]) {
-            let d = demoMap[phone];
-            resDiv.innerHTML = `📞 Nomor: ${phone}<br>📡 Provider: ${d.provider}<br>🗺 Wilayah: ${d.region}<br>🏙 Kota: ${d.city}<br>🕒 Waktu: ${new Date().toLocaleString()}`;
-            return;
-        }
-        resDiv.innerHTML = `⚠️ Data nomor ${phone} tidak ditemukan di database demo.<br>💡 Contoh real: 628123456789 → Sulawesi Selatan, Makassar.`;
-    }
-
-    loadSession();
-    loadHistory();
+    loadSession(); loadHistory();
 </script>
 </body>
 </html>
