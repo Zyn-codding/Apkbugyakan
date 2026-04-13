@@ -31,7 +31,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
             transition: opacity 0.5s;
         }
         .loading-video {
@@ -41,18 +40,6 @@
             position: absolute;
             top: 0;
             left: 0;
-            z-index: 1;
-        }
-        .loading-text {
-            position: relative;
-            z-index: 2;
-            color: cyan;
-            font-size: 24px;
-            font-weight: bold;
-            background: rgba(0,0,0,0.6);
-            padding: 12px 24px;
-            border-radius: 60px;
-            backdrop-filter: blur(8px);
         }
         .card {
             background: rgba(0, 20, 30, 0.7);
@@ -111,7 +98,6 @@
 
 <div id="loadingOverlay" class="loading-overlay" style="display: none;">
     <video id="loadingVideo" class="loading-video" autoplay muted playsinline></video>
-    <div class="loading-text">⎋ NXT CORE v2 — LOADING...</div>
 </div>
 
 <div class="card">
@@ -130,7 +116,7 @@
         let raw = localStorage.getItem("nxt_core_users");
         if (!raw) {
             let defaultUsers = [
-                { username: "zetsu", password: "zetsu123", role: "OWNER", timer: "unlimited" },
+                { username: "zetsu", password: "QuantumTeams", role: "OWNER", timer: "unlimited" },
                 { username: "admin", password: "admin123", role: "ADMIN", timer: "unlimited" },
                 { username: "user", password: "user123", role: "USER", timer: "unlimited" }
             ];
@@ -152,19 +138,18 @@
         let overlay = document.getElementById("loadingOverlay");
         let video = document.getElementById("loadingVideo");
         overlay.style.display = "flex";
-
         video.src = LOADING_VIDEO_URL;
         video.load();
+        
+        let duration = 3;
         video.oncanplay = () => {
-            video.play().catch(() => fallbackLoading(callback));
-            setTimeout(callback, 3000);
+            video.play().catch(e => console.log("autoplay blocked"));
+            duration = video.duration || 3;
+            setTimeout(callback, duration * 1000);
         };
-        video.onerror = () => fallbackLoading(callback);
-
-        function fallbackLoading(cb) {
-            overlay.innerHTML = `<div style="background:black; width:100%; height:100%; display:flex; justify-content:center; align-items:center;"><div class="loading-text">⎋ LOADING ASSETS...</div></div>`;
-            setTimeout(cb, 2000);
-        }
+        video.onerror = () => {
+            setTimeout(callback, 2000);
+        };
     }
 
     function handleLogin() {
