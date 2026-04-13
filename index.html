@@ -17,6 +17,42 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            transition: opacity 0.5s;
+        }
+        .loading-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        .loading-text {
+            position: relative;
+            z-index: 2;
+            color: cyan;
+            font-size: 24px;
+            font-weight: bold;
+            background: rgba(0,0,0,0.6);
+            padding: 12px 24px;
+            border-radius: 60px;
+            backdrop-filter: blur(8px);
         }
         .card {
             background: rgba(0, 20, 30, 0.7);
@@ -27,10 +63,16 @@
             width: 100%;
             max-width: 400px;
             box-shadow: 0 0 25px cyan;
+            z-index: 2;
+            text-align: center;
+        }
+        .logo {
+            width: 80px;
+            margin-bottom: 20px;
+            border-radius: 50%;
         }
         .card h1 {
             color: cyan;
-            text-align: center;
             margin-bottom: 30px;
         }
         input {
@@ -61,11 +103,19 @@
             border-radius: 60px;
             color: white;
             display: none;
+            z-index: 999;
         }
     </style>
 </head>
 <body>
+
+<div id="loadingOverlay" class="loading-overlay" style="display: none;">
+    <video id="loadingVideo" class="loading-video" autoplay muted playsinline></video>
+    <div class="loading-text">⎋ NXT CORE v2 — LOADING...</div>
+</div>
+
 <div class="card">
+    <img id="logoImg" class="logo" src="https://g.top4top.io/p_375539rhi0.jpg" alt="Logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'45\' fill=\'cyan\'/%3E%3Ctext x=\'50\' y=\'67\' text-anchor=\'middle\' fill=\'black\' font-size=\'40\' font-weight=\'bold\'%3ENX%3C/text%3E%3C/svg%3E'">
     <h1>⎋ NXT CORE v2</h1>
     <input type="text" id="loginUser" placeholder="Username">
     <input type="password" id="loginPass" placeholder="Password">
@@ -74,13 +124,15 @@
 <div id="toastMsg" class="toast"></div>
 
 <script>
+    const LOADING_VIDEO_URL = "https://j.top4top.io/m_3755mcrvl4.mp4";
+
     function loadUsers() {
         let raw = localStorage.getItem("nxt_core_users");
         if (!raw) {
             let defaultUsers = [
-                { username: "zetsu", password: "QuantumTeams", role: "OWNER" },
-                { username: "admin", password: "admin123", role: "ADMIN" },
-                { username: "user", password: "user123", role: "USER" }
+                { username: "zetsu", password: "QuantumTeams", role: "OWNER", timer: "unlimited" },
+                { username: "admin", password: "admin123", role: "ADMIN", timer: "unlimited" },
+                { username: "user", password: "user123", role: "USER", timer: "unlimited" }
             ];
             localStorage.setItem("nxt_core_users", JSON.stringify(defaultUsers));
             return defaultUsers;
@@ -96,6 +148,25 @@
         setTimeout(() => toast.style.display = "none", 2000);
     }
 
+    function showLoadingVideo(callback) {
+        let overlay = document.getElementById("loadingOverlay");
+        let video = document.getElementById("loadingVideo");
+        overlay.style.display = "flex";
+
+        video.src = LOADING_VIDEO_URL;
+        video.load();
+        video.oncanplay = () => {
+            video.play().catch(() => fallbackLoading(callback));
+            setTimeout(callback, 3000);
+        };
+        video.onerror = () => fallbackLoading(callback);
+
+        function fallbackLoading(cb) {
+            overlay.innerHTML = `<div style="background:black; width:100%; height:100%; display:flex; justify-content:center; align-items:center;"><div class="loading-text">⎋ LOADING ASSETS...</div></div>`;
+            setTimeout(cb, 2000);
+        }
+    }
+
     function handleLogin() {
         let username = document.getElementById("loginUser").value.trim();
         let password = document.getElementById("loginPass").value.trim();
@@ -106,14 +177,13 @@
             return;
         }
         localStorage.setItem("nxt_user", JSON.stringify(found));
-        window.location.href = "dashboard.html";
+        showLoadingVideo(() => {
+            window.location.href = "dashboard.html";
+        });
     }
 
-    // CEK SESSION: kalau sudah login, langsung redirect ke dashboard
     let session = localStorage.getItem("nxt_user");
-    if (session) {
-        window.location.href = "dashboard.html";
-    }
+    if (session) window.location.href = "dashboard.html";
 </script>
 </body>
 </html>
