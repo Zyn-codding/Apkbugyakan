@@ -30,8 +30,7 @@
         .card h3 { color: cyan; margin-bottom: 18px; border-left: 4px solid cyan; padding-left: 12px; }
         input, select { width: 100%; padding: 12px; background: black; border: 1px solid cyan; border-radius: 30px; color: white; margin: 8px 0 16px; }
         .btn-primary { background: cyan; color: black; font-weight: bold; width: 100%; padding: 12px; border-radius: 30px; border: none; cursor: pointer; }
-        .history-item { background: #0ff1; margin: 12px 0; padding: 12px; border-radius: 20px; border-left: 3px solid cyan; cursor: pointer; transition: 0.2s; }
-        .history-item:hover { background: #0ff3; transform: translateX(5px); }
+        .history-item { background: #0ff1; margin: 12px 0; padding: 12px; border-radius: 20px; border-left: 3px solid cyan; }
         .result-box { background: #00000099; border-radius: 20px; padding: 15px; margin-top: 15px; }
         .vip-card { background: #0ff2; border: 1px solid gold; margin-top: 20px; text-align: center; }
         .vip-btn { background: cyan; color: black; border: none; padding: 10px; border-radius: 60px; margin: 8px; cursor: pointer; font-weight: bold; width: 90%; }
@@ -54,7 +53,6 @@
             <a class="nav-link" data-section="bug">Bug</a>
             <a class="nav-link" data-section="iptracker">IP Tracker</a>
             <a class="nav-link" data-section="numbertracker">Number Tracker</a>
-            <a class="nav-link" data-section="music">🎵 Music</a>
             <a class="nav-link" data-section="plans">Plans</a>
             <a class="nav-link" data-section="about">About</a>
         </div>
@@ -64,17 +62,15 @@
         </div>
     </div>
 
-    <!-- HOME SECTION -->
     <div id="home" class="section active">
         <div class="card" style="text-align:center">
             <h3>🔥 WELCOME TO NXT CORE v2</h3>
-            <p>Full forensic suite: Bug Sender, IP Tracker, Number Tracker, Music Player.</p>
+            <p>Full forensic suite: Bug Sender, IP Tracker, Number Tracker (WhatsApp Lookup).</p>
             <div id="managerLink"></div>
             <div id="vipSection"></div>
         </div>
     </div>
 
-    <!-- BUG SECTION -->
     <div id="bug" class="section"><div class="card"><h3>🐛 BUG SENDER</h3>
         <input type="text" id="bugTarget" placeholder="Nomor target (628xxx)">
         <select id="bugTypeSelect"><option>CRASH WA</option><option>FORCLOSE</option><option>DELAY INVISIBLE</option><option>DELAY HARD</option><option>ONE MSG FC</option><option>BLANK</option></select>
@@ -82,84 +78,31 @@
         <div style="margin-top:20px;"><h4>📜 RIWAYAT BUG</h4><div id="historyList"></div><button onclick="clearHistory()" style="margin-top:12px; background:#333; padding:8px; border-radius:30px;">🗑 HAPUS RIWAYAT</button></div>
     </div></div>
 
-    <!-- IP TRACKER SECTION -->
     <div id="iptracker" class="section"><div class="card"><h3>🌐 IP TRACKER</h3>
         <input type="text" id="ipTarget" placeholder="IP target / kosongkan = IP sendiri">
         <button class="btn-primary" onclick="trackIP()">⟡ LACAK IP ⟡</button>
         <div id="ipResult" class="result-box" style="display:none;"></div>
     </div></div>
 
-    <!-- NUMBER TRACKER SECTION -->
+    <!-- NUMBER TRACKER SECTION (WHATSAPP LOOKUP) -->
     <div id="numbertracker" class="section">
-        <div class="card"><h3>📞 NUMBER TRACKER (WHATSAPP)</h3>
+        <div class="card">
+            <h3>📞 NUMBER TRACKER (WHATSAPP LOOKUP)</h3>
             <input type="text" id="phoneNumber" placeholder="Masukkan nomor hp (628xxx)">
             <button class="btn-primary" onclick="trackPhone()">⟡ LACAK NOMOR ⟡</button>
             <div id="phoneResult" class="result-box" style="display:none;"></div>
-            <p style="font-size:11px; margin-top:12px;">💡 Contoh: 628123456789 → Telkomsel, Sulawesi Selatan</p>
+            <p style="font-size:12px; margin-top:12px;">💡 Contoh: 628123456789 → Telkomsel, Sulawesi Selatan</p>
+            <p style="font-size:11px; color:#888;">⚠️ Mode demo: Data berdasarkan prefix nomor. Untuk akurasi real butuh API berbayar.</p>
         </div>
     </div>
 
-    <!-- MUSIC PLAYER SECTION -->
-    <div id="music" class="section">
-        <div class="card">
-            <h3>🎵 MUSIC PLAYER — NXT CORE v2</h3>
-            
-            <input type="text" id="searchSong" placeholder="Cari lagu lain (YouTube)">
-            <button class="btn-primary" onclick="searchAndPlay()">⟡ SEARCH & PLAY ⟡</button>
-            
-            <input type="file" id="uploadMp3" accept="audio/mp3" style="margin-top: 16px;">
-            <button class="btn-primary" onclick="uploadAndPlay()">⟡ PLAY UPLOADED ⟡</button>
-            
-            <div style="background:#0ff1; border-radius: 60px; padding: 16px; margin-top: 20px;">
-                <div id="nowPlaying" style="color:cyan; margin-bottom: 12px;">🎧 Tidak ada lagu diputar</div>
-                <audio id="audioPlayer" controls style="width:100%; border-radius: 60px;"></audio>
-                <div style="margin-top: 12px;">
-                    <button onclick="playPause()" style="background:cyan; border:none; padding:8px 20px; border-radius:60px; margin-right:8px; cursor:pointer;">⏯️ Play/Pause</button>
-                    <button onclick="stopMusic()" style="background:#a00; border:none; padding:8px 20px; border-radius:60px; cursor:pointer;">⏹️ Stop</button>
-                    <input type="range" id="volumeControl" min="0" max="100" value="70" style="width:120px; margin-left:8px;" onchange="setVolume()">
-                </div>
-            </div>
-            
-            <!-- PLAYLIST ZETSU (19 LAGU) -->
-            <div style="margin-top: 20px;">
-                <h4 style="color:cyan;">📜 PLAYLIST ZETSU (19 LAGU)</h4>
-                <div id="demoPlaylist" style="max-height: 400px; overflow-y: auto;">
-                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', '1. Brooklynbloodpop - Syko')">🎵 1. Brooklynbloodpop - Syko</div>
-                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', '2. Monolog - Pamungkas')">🎵 2. Monolog - Pamungkas</div>
-                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', '3. Disco - Surf Curse')">🎵 3. Disco - Surf Curse</div>
-                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', '4. Back to Friends - Somethinc')">🎵 4. Back to Friends - Somethinc</div>
-                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', '5. Notion - The Rare Occasions')">🎵 5. Notion - The Rare Occasions</div>
-                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', '6. Evakuasi - Hindia')">🎵 6. Evakuasi - Hindia</div>
-                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', '7. Evaluasi - Hindia')">🎵 7. Evaluasi - Hindia</div>
-                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', '8. Bunga Maaf - Sal Priadi')">🎵 8. Bunga Maaf - Sal Priadi</div>
-                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', '9. Sailor Song - Gigi Perez')">🎵 9. Sailor Song - Gigi Perez</div>
-                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', '10. You\'ll Be in My Heart - Phil Collins')">🎵 10. You'll Be in My Heart - Phil Collins</div>
-                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', '11. Fraksi - Nadin Amizah')">🎵 11. Fraksi - Nadin Amizah</div>
-                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', '12. Love Me Not - Ravaughn')">🎵 12. Love Me Not - Ravaughn</div>
-                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', '13. No 1 Party Anthem')">🎵 13. No 1 Party Anthem</div>
-                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', '14. Cincin')">🎵 14. Cincin</div>
-                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', '15. Terbuang Dalam Waktu')">🎵 15. Terbuang Dalam Waktu</div>
-                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', '16. Prom Queen')">🎵 16. Prom Queen</div>
-                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', '17. I Wanna Be Yours - Arctic Monkeys')">🎵 17. I Wanna Be Yours - Arctic Monkeys</div>
-                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', '18. Anything You Want')">🎵 18. Anything You Want</div>
-                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', '19. Only You')">🎵 19. Only You</div>
-                </div>
-            </div>
-            
-            <p style="font-size:11px; margin-top:16px; color:#888;">💡 Klik lagu di atas untuk langsung dengerin. Upload MP3 sendiri atau cari dari YouTube (demo).</p>
-        </div>
-    </div>
-
-    <!-- PLANS SECTION -->
     <div id="plans" class="section"><div class="card"><h3>💎 MEMBERSHIP PLANS</h3>
         <div class="plans-container"><div class="plan-card">🔥 BASIC USER — Rp25.000</div><div class="plan-card">⚡ RESELLER — Rp60.000</div><div class="plan-card">👑 ADMIN USER — Rp100.000</div></div>
         <p style="margin-top:12px">Hubungi @SyallOfficial untuk pembelian.</p>
     </div></div>
 
-    <!-- ABOUT SECTION -->
-    <div id="about" class="section"><div class="card"><h3>📌 ABOUT NXT CORE</h3><p>Platform forensic digital + hiburan music player.</p><p>© 2025 NXT CORE v2 — ZETSU PROJECT</p></div></div>
-    
-    <footer>NXT CORE v2 — Bug Sender | IP Tracker | Number Tracker | Music Player</footer>
+    <div id="about" class="section"><div class="card"><h3>📌 ABOUT NXT CORE</h3><p>Platform forensic digital untuk bug simulation, IP tracking, dan WhatsApp number lookup.</p><p>© 2025 NXT CORE v2 — ZETSU PROJECT</p></div></div>
+    <footer>NXT CORE v2 — All trackers + bug simulation (riwayat lokal)</footer>
 </div>
 
 <script>
@@ -181,7 +124,7 @@
     }
     function logout() { localStorage.removeItem("nxt_user"); window.location.href = "index.html"; }
 
-    const sections = ["home","bug","iptracker","numbertracker","music","plans","about"];
+    const sections = ["home","bug","iptracker","numbertracker","plans","about"];
     function showSection(id) { sections.forEach(sec => document.getElementById(sec).classList.remove("active")); document.getElementById(id).classList.add("active"); document.querySelectorAll(".nav-link").forEach(link => link.classList.remove("active")); document.querySelector(`.nav-link[data-section="${id}"]`).classList.add("active"); }
     document.querySelectorAll(".nav-link").forEach(link => link.addEventListener("click", (e) => { e.preventDefault(); showSection(link.getAttribute("data-section")); }));
 
@@ -195,88 +138,86 @@
 
     async function trackIP() { let ip = document.getElementById("ipTarget").value.trim(); let url = ip ? `https://ipapi.co/${ip}/json/` : `https://ipapi.co/json/`; let resDiv = document.getElementById("ipResult"); resDiv.style.display = "block"; resDiv.innerHTML = "⏳ Melacak IP..."; try { let resp = await fetch(url); let data = await resp.json(); if (data.error) throw new Error(); resDiv.innerHTML = `<b>🌍 IP:</b> ${data.ip}<br><b>📍 Kota:</b> ${data.city || '-'}<br><b>🗺 Wilayah:</b> ${data.region || '-'}<br><b>🌎 Negara:</b> ${data.country_name || '-'}<br><b>📡 ISP:</b> ${data.org || '-'}`; } catch(e) { resDiv.innerHTML = "❌ Gagal lacak IP."; } }
     
+    // NUMBER TRACKER FIX - WhatsApp Lookup Simulation
     async function trackPhone() {
         let phone = document.getElementById("phoneNumber").value.trim();
         let resDiv = document.getElementById("phoneResult");
-        if (!phone) { alert("Masukkan nomor target!"); return; }
-        if (!/^[0-9]+$/.test(phone)) { alert("Goblok ada huruf nya tolol!"); return; }
+        
+        if (!phone) {
+            alert("Masukkan nomor target!");
+            return;
+        }
+        
+        if (!/^[0-9]+$/.test(phone)) {
+            alert("Goblok ada huruf nya tolol!");
+            return;
+        }
+        
         resDiv.style.display = "block";
         resDiv.innerHTML = "⏳ Melacak nomor WhatsApp...";
+        
         setTimeout(() => {
             let prefix = phone.substring(0, 4);
-            let provider = "", location = "", city = "";
+            let provider = "";
+            let location = "";
+            let city = "";
+            
+            // Provider & location mapping based on Indonesian prefixes
             if (prefix === "6281" || prefix === "6282" || prefix === "6283") {
                 provider = "Telkomsel";
                 if (prefix === "6282") { location = "Sulawesi Selatan"; city = "Makassar"; }
                 else if (prefix === "6283") { location = "Sulawesi Utara"; city = "Manado"; }
                 else { location = "Jawa Barat"; city = "Bandung"; }
-            } else if (prefix === "6285" || prefix === "6287") { provider = "Indosat / IM3"; location = "Jawa Timur"; city = "Surabaya"; }
-            else if (prefix === "6288") { provider = "XL / Axis"; location = "Sumatera Utara"; city = "Medan"; }
-            else if (prefix === "6289") { provider = "Tri (3)"; location = "Jawa Tengah"; city = "Semarang"; }
-            else if (prefix === "6286") { provider = "Smartfren"; location = "Banten"; city = "Tangerang"; }
-            else { provider = "Unknown"; location = "Tidak diketahui"; city = "-"; }
+            } 
+            else if (prefix === "6285" || prefix === "6287") {
+                provider = "Indosat / IM3";
+                location = "Jawa Timur";
+                city = "Surabaya";
+            }
+            else if (prefix === "6288") {
+                provider = "XL / Axis";
+                location = "Sumatera Utara";
+                city = "Medan";
+            }
+            else if (prefix === "6289") {
+                provider = "Tri (3)";
+                location = "Jawa Tengah";
+                city = "Semarang";
+            }
+            else if (prefix === "6286") {
+                provider = "Smartfren";
+                location = "Banten";
+                city = "Tangerang";
+            }
+            else {
+                provider = "Unknown Provider";
+                location = "Tidak diketahui";
+                city = "-";
+            }
+            
             let isWhatsApp = Math.random() > 0.2;
-            resDiv.innerHTML = `<b>📞 Nomor:</b> ${phone}<br><b>🌍 Provider:</b> ${provider}<br><b>📍 Lokasi:</b> ${location}<br><b>🏙️ Kota:</b> ${city}<br><b>📡 WhatsApp:</b> ${isWhatsApp ? "✅ TERDAFTAR" : "❌ TIDAK TERDAFTAR"}<br><b>🕒 Waktu:</b> ${new Date().toLocaleString()}`;
+            let waStatus = isWhatsApp ? "✅ TERDAFTAR" : "❌ TIDAK TERDAFTAR";
+            let waType = isWhatsApp ? (Math.random() > 0.7 ? "WhatsApp Business" : "WhatsApp Personal") : "-";
+            let areaCode = phone.substring(0, 6);
+            
+            resDiv.innerHTML = `
+                <div style="font-family: monospace;">
+                    <b>📱 HASIL PELACAKAN NOMOR WHATSAPP</b><br><br>
+                    <b>📞 Nomor:</b> ${phone}<br>
+                    <b>🌍 Provider:</b> ${provider}<br>
+                    <b>📍 Lokasi:</b> ${location}<br>
+                    <b>🏙️ Kota:</b> ${city}<br>
+                    <b>📡 Status WhatsApp:</b> ${waStatus}<br>
+                    <b>💼 Tipe:</b> ${waType}<br>
+                    <b>🕒 Waktu Lacak:</b> ${new Date().toLocaleString()}<br>
+                    <b>🔢 Kode Area:</b> ${areaCode}<br><br>
+                    <i>⚠️ Mode Demo: Data ini simulasi berdasarkan prefix nomor.<br>
+                    Contoh real: 628123456789 → Telkomsel, Sulawesi Selatan<br>
+                    Untuk akurasi real-time, butuh API berbayar (Wassenger/AbstractAPI).</i>
+                </div>
+            `;
         }, 1500);
     }
-
-    // MUSIC PLAYER FUNCTIONS
-    let audio = document.getElementById("audioPlayer");
-    let currentSongTitle = "";
-    
-    function playDemoSong(url, title) {
-        audio.src = url;
-        audio.play();
-        currentSongTitle = title;
-        document.getElementById("nowPlaying").innerHTML = `🎧 Sekarang diputar: ${title}`;
-    }
-    
-    function uploadAndPlay() {
-        let fileInput = document.getElementById("uploadMp3");
-        let file = fileInput.files[0];
-        if (!file) { alert("Upload file MP3 dulu!"); return; }
-        let url = URL.createObjectURL(file);
-        audio.src = url;
-        audio.play();
-        currentSongTitle = file.name;
-        document.getElementById("nowPlaying").innerHTML = `🎧 Sekarang diputar: ${file.name}`;
-    }
-    
-    function searchAndPlay() {
-        let query = document.getElementById("searchSong").value.trim();
-        if (!query) { alert("Masukkan judul lagu!"); return; }
-        alert(`🔍 Mencari "${query}" di YouTube...\n(Fitur demo, integrasi API butuh key)`);
-        playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', `Demo: ${query}`);
-    }
-    
-    function playPause() { if (audio.paused) audio.play(); else audio.pause(); }
-    function stopMusic() { audio.pause(); audio.currentTime = 0; document.getElementById("nowPlaying").innerHTML = "🎧 Tidak ada lagu diputar"; }
-    function setVolume() { audio.volume = document.getElementById("volumeControl").value / 100; }
-
-    loadSession(); loadHistory();
-</script>
-</body>
-</html>        } else {
-            managerDiv.innerHTML = "";
-            vipDiv.innerHTML = "";
-        }
-    }
-    function logout() { localStorage.removeItem("nxt_user"); window.location.href = "index.html"; }
-
-    const sections = ["home","bug","iptracker","plans","about"];
-    function showSection(id) { sections.forEach(sec => document.getElementById(sec).classList.remove("active")); document.getElementById(id).classList.add("active"); document.querySelectorAll(".nav-link").forEach(link => link.classList.remove("active")); document.querySelector(`.nav-link[data-section="${id}"]`).classList.add("active"); }
-    document.querySelectorAll(".nav-link").forEach(link => link.addEventListener("click", (e) => { e.preventDefault(); showSection(link.getAttribute("data-section")); }));
-
-    let bugHistory = [];
-    function loadHistory() { let h = localStorage.getItem("nxt_bug_history_v2"); bugHistory = h ? JSON.parse(h) : []; renderHistory(); }
-    function renderHistory() { let div = document.getElementById("historyList"); if (!bugHistory.length) { div.innerHTML = "Belum ada riwayat"; return; } div.innerHTML = bugHistory.map(h => `<div class="history-item">📱 ${h.target}<br>🐞 ${h.bug}<br>🕒 ${h.waktu}</div>`).join(''); }
-    function saveHistory() { localStorage.setItem("nxt_bug_history_v2", JSON.stringify(bugHistory.slice(0,30))); renderHistory(); }
-    function addHistory(target, bug) { bugHistory.unshift({ target, bug, waktu: new Date().toLocaleString() }); saveHistory(); }
-    function clearHistory() { bugHistory = []; saveHistory(); }
-    function sendBug() { let target = document.getElementById("bugTarget").value.trim(); let bug = document.getElementById("bugTypeSelect").value; if (!target) { alert("Isi nomor target dulu."); return; } if (!/^[0-9+]+$/.test(target)) { alert("Goblok ada huruf nya tolol!"); return; } addHistory(target, bug); alert(`✅ Success Sending bug ${bug} ke ${target}`); document.getElementById("bugTarget").value = ""; }
-
-    async function trackIP() { let ip = document.getElementById("ipTarget").value.trim(); let url = ip ? `https://ipapi.co/${ip}/json/` : `https://ipapi.co/json/`; let resDiv = document.getElementById("ipResult"); resDiv.style.display = "block"; resDiv.innerHTML = "⏳ Melacak IP..."; try { let resp = await fetch(url); let data = await resp.json(); if (data.error) throw new Error(); resDiv.innerHTML = `<b>🌍 IP:</b> ${data.ip}<br><b>📍 Kota:</b> ${data.city || '-'}<br><b>🗺 Wilayah:</b> ${data.region || '-'}<br><b>🌎 Negara:</b> ${data.country_name || '-'}<br><b>📡 ISP:</b> ${data.org || '-'}`; } catch(e) { resDiv.innerHTML = "❌ Gagal lacak IP."; } }
-    async function trackPhone() { let phone = document.getElementById("phoneNumber").value.trim(); let resDiv = document.getElementById("phoneResult"); if (!phone) { alert("Masukkan nomor target!"); return; } resDiv.style.display = "block"; resDiv.innerHTML = "⏳ Melacak nomor..."; let demoMap = { "628123456789": { provider: "Telkomsel", region: "Sulawesi Selatan", city: "Makassar" } }; if (demoMap[phone]) { let d = demoMap[phone]; resDiv.innerHTML = `📞 Nomor: ${phone}<br>📡 Provider: ${d.provider}<br>🗺 Wilayah: ${d.region}<br>🏙 Kota: ${d.city}`; } else { resDiv.innerHTML = `⚠️ Data nomor ${phone} tidak ditemukan.<br>💡 Contoh: 628123456789 → Sulawesi Selatan.`; } }
 
     loadSession(); loadHistory();
 </script>
