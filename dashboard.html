@@ -32,7 +32,8 @@
         .btn-primary { background: cyan; color: black; font-weight: bold; width: 100%; padding: 12px; border-radius: 30px; border: none; cursor: pointer; }
         .history-item { background: #0ff1; margin: 12px 0; padding: 12px; border-radius: 20px; border-left: 3px solid cyan; }
         .result-box { background: #00000099; border-radius: 20px; padding: 15px; margin-top: 15px; }
-        .vip-card { background: #0ff2; border: 1px solid gold; margin-top: 20px; }
+        .vip-card { background: #0ff2; border: 1px solid gold; margin-top: 20px; text-align: center; }
+        .vip-btn { background: cyan; color: black; border: none; padding: 10px; border-radius: 60px; margin: 8px; cursor: pointer; font-weight: bold; width: 90%; }
         .manager-link { display: inline-block; margin-top: 12px; color: cyan; text-decoration: none; border: 1px solid cyan; padding: 6px 16px; border-radius: 60px; }
         .plans-container { display: flex; flex-direction: column; gap: 16px; }
         .plan-card { background: #0ff1; padding: 16px; border-radius: 24px; }
@@ -107,7 +108,7 @@
         let vipDiv = document.getElementById("vipSection");
         if (currentUser.username === "zetsu") {
             managerDiv.innerHTML = `<a href="manager.html" class="manager-link">🔧 USER MANAGER (ZETSU ONLY)</a>`;
-            vipDiv.innerHTML = `<div class="card vip-card" style="margin-top:20px; text-align:center;"><h3>⭐ ROLE'S VVIP</h3><p>Reseller → bisa create USER</p><p>Partner → bisa create USER + RESELLER</p><p>Owner → bisa create USER + RESELLER + PARTNER</p><p>⏱️ Timer: 1 day, 1 week, 1 month, 2 month, unlimited</p></div>`;
+            vipDiv.innerHTML = `<div class="card vip-card"><h3>⭐ ROLE'S VVIP (ZETSU ONLY)</h3><button class="vip-btn" onclick="alert('Reseller bisa create USER')">🔄 RESELLER</button><button class="vip-btn" onclick="alert('Partner bisa create USER + RESELLER')">🤝 PARTNER</button><button class="vip-btn" onclick="alert('Owner bisa create USER + RESELLER + PARTNER + Timer')">👑 OWNER</button><p style="margin-top:10px">⏱️ Timer: 1 day, 1 week, 1 month, 2 month, unlimited</p></div>`;
         } else {
             managerDiv.innerHTML = "";
             vipDiv.innerHTML = "";
