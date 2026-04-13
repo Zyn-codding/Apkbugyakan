@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NXT CORE v2 | DASHBOARD</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        body {
+            background: #010101;
+            color: #ccc;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid cyan;
+            padding-bottom: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .badge-user {
+            background: #0ff1;
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-size: 14px;
+        }
+        .btn-logout {
+            background: #a00;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 26px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: #0a0e17cc;
+            backdrop-filter: blur(8px);
+            border: 1px solid #0ff3;
+            border-radius: 32px;
+            padding: 22px;
+        }
+        .card h3 {
+            color: cyan;
+            margin-bottom: 18px;
+            border-left: 4px solid cyan;
+            padding-left: 12px;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            background: #000000aa;
+            border: 1px solid cyan;
+            border-radius: 30px;
+            color: white;
+            margin: 8px 0 16px;
+        }
+        .btn-primary {
+            background: cyan;
+            color: black;
+            font-weight: bold;
+            width: 100%;
+            padding: 12px;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+        }
+        .history-item {
+            background: #0ff1;
+            margin: 12px 0;
+            padding: 12px;
+            border-radius: 20px;
+            border-left: 3px solid cyan;
+        }
+        .result-box {
+            background: #00000099;
+            border-radius: 20px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        .manager-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: cyan;
+            text-decoration: none;
+            border: 1px solid cyan;
+            padding: 6px 16px;
+            border-radius: 60px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 11px;
+            opacity: 0.5;
+        }
+        @media (max-width: 700px) {
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h2 style="color:cyan">⎋ NXT CORE v2 — FORENSIC SUITE</h2>
+        <div class="badge-user" id="userInfo">Loading...</div>
+        <button class="btn-logout" onclick="logout()">⟡ LOGOUT ⟡</button>
+    </div>
+
+    <div class="grid-2">
+        <!-- BUG SENDER + RIWAYAT -->
+        <div class="card">
+            <h3>🐛 BUG SENDER</h3>
+            <input type="text" id="bugTarget" placeholder="Nomor target (628xxx)">
+            <select id="bugTypeSelect">
+                <option>CRASH WA</option><option>FORCLOSE</option><option>DELAY INVISIBLE</option>
+                <option>DELAY HARD</option><option>ONE MSG FC</option><option>BLANK</option>
+            </select>
+            <button class="btn-primary" onclick="sendBug()">⟡ SEND BUG ⟡</button>
+            <div style="margin-top: 20px;"><h4>📜 RIWAYAT BUG</h4>
+                <div id="historyList">Belum ada riwayat</div>
+                <button onclick="clearHistory()" style="margin-top: 12px; background:#333; padding:8px; border-radius:30px; border:none; color:white;">🗑 HAPUS RIWAYAT</button>
+            </div>
+        </div>
+
+        <!-- IP TRACKER -->
+        <div class="card">
+            <h3>🌐 IP TRACKER</h3>
+            <input type="text" id="ipTarget" placeholder="IP target / kosongkan = IP sendiri">
+            <button class="btn-primary" onclick="trackIP()">⟡ LACAK IP ⟡</button>
+            <div id="ipResult" class="result-box" style="display:none;"></div>
+        </div>
+
+        <!-- NUMBER TRACKER -->
+        <div class="card">
+            <h3>📞 NUMBER TRACKER</h3>
+            <input type="text" id="phoneNumber" placeholder="Masukkan nomor hp (628xxx)">
+            <button class="btn-primary" onclick="trackPhone()">⟡ LACAK NOMOR ⟡</button>
+            <div id="phoneResult" class="result-box" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- MANAGER LINK (HANYA UNTUK ZETSU) -->
+    <div id="managerLink" style="text-align:center; margin-bottom:20px;"></div>
+
+    <footer>NXT CORE v2 — All trackers + bug simulation (riwayat lokal)</footer>
+</div>
+
+<script>
+    // ========== SESSION & LOGOUT ==========
+    let currentUser = null;
+    function loadSession() {
+        let raw = localStorage.getItem("nxt_user");
+        if (!raw) { window.location.href = "index.html"; return; }
+        currentUser = JSON.parse(raw);
+        document.getElementById("userInfo").innerHTML = `👤 ${currentUser.username} (${currentUser.role})`;
+
+        // Tampilkan link manager hanya untuk zetsu
+        let managerDiv = document.getElementById("managerLink");
+        if (currentUser.username === "zetsu") {
+            managerDiv.innerHTML = `<a href="manager.html" class="manager-link">🔧 USER MANAGER (ZETSU ONLY)</a>`;
+        } else {
+            managerDiv.innerHTML = "";
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem("nxt_user");
+        window.location.href = "index.html";
+    }
+
+    // ========== RIWAYAT BUG ==========
+    let bugHistory = [];
+    function loadHistory() {
+        let h = localStorage.getItem("nxt_bug_history_v2");
+        bugHistory = h ? JSON.parse(h) : [];
+        renderHistory();
+    }
+    function saveHistory() {
+        localStorage.setItem("nxt_bug_history_v2", JSON.stringify(bugHistory.slice(0, 30)));
+        renderHistory();
+    }
+    function renderHistory() {
+        let div = document.getElementById("historyList");
+        if (!bugHistory.length) { div.innerHTML = "Belum ada riwayat"; return; }
+        div.innerHTML = bugHistory.map(h => `<div class="history-item">📱 ${h.target}<br>🐞 ${h.bug}<br>🕒 ${h.waktu}</div>`).join('');
+    }
+    function addHistory(target, bug) {
+        bugHistory.unshift({ target, bug, waktu: new Date().toLocaleString() });
+        saveHistory();
+    }
+    function clearHistory() {
+        bugHistory = [];
+        saveHistory();
+    }
+
+    // ========== SEND BUG ==========
+    function sendBug() {
+        let target = document.getElementById("bugTarget").value.trim();
+        let bug = document.getElementById("bugTypeSelect").value;
+        if (!target) { alert("Isi nomor target dulu."); return; }
+        if (!/^[0-9+]+$/.test(target)) { alert("Goblok ada huruf nya tolol!"); return; }
+        addHistory(target, bug);
+        alert(`✅ Success Sending bug ${bug} ke ${target}`);
+        document.getElementById("bugTarget").value = "";
+    }
+
+    // ========== IP TRACKER ==========
+    async function trackIP() {
+        let ip = document.getElementById("ipTarget").value.trim();
+        let url = ip ? `https://ipapi.co/${ip}/json/` : `https://ipapi.co/json/`;
+        let resDiv = document.getElementById("ipResult");
+        resDiv.style.display = "block";
+        resDiv.innerHTML = "⏳ Melacak IP...";
+        try {
+            let resp = await fetch(url);
+            let data = await resp.json();
+            if (data.error) throw new Error("IP invalid");
+            resDiv.innerHTML = `<b>🌍 IP:</b> ${data.ip}<br><b>📍 Kota:</b> ${data.city || '-'}<br><b>🗺 Wilayah:</b> ${data.region || '-'}<br><b>🌎 Negara:</b> ${data.country_name || '-'}<br><b>📡 ISP:</b> ${data.org || '-'}<br><b>⏰ Waktu:</b> ${new Date().toLocaleString()}`;
+        } catch(e) {
+            resDiv.innerHTML = "❌ Gagal lacak IP. Coba lagi.";
+        }
+    }
+
+    // ========== NUMBER TRACKER ==========
+    async function trackPhone() {
+        let phone = document.getElementById("phoneNumber").value.trim();
+        let resDiv = document.getElementById("phoneResult");
+        if (!phone) { alert("Masukkan nomor target!"); return; }
+        resDiv.style.display = "block";
+        resDiv.innerHTML = "⏳ Melacak nomor...";
+        let demoMap = {
+            "628123456789": { provider: "Telkomsel", region: "Sulawesi Selatan", city: "Makassar" },
+            "628219876543": { provider: "Indosat", region: "Jawa Timur", city: "Surabaya" },
+            "628577890123": { provider: "XL", region: "Sulawesi Utara", city: "Manado" }
+        };
+        if (demoMap[phone]) {
+            let d = demoMap[phone];
+            resDiv.innerHTML = `📞 Nomor: ${phone}<br>📡 Provider: ${d.provider}<br>🗺 Wilayah: ${d.region}<br>🏙 Kota: ${d.city}<br>🕒 Waktu: ${new Date().toLocaleString()}`;
+            return;
+        }
+        resDiv.innerHTML = `⚠️ Data nomor ${phone} tidak ditemukan di database demo.<br>💡 Contoh real: 628123456789 → Sulawesi Selatan, Makassar.`;
+    }
+
+    loadSession();
+    loadHistory();
+</script>
+</body>
+</html>
