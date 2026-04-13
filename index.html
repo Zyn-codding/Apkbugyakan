@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NXT CORE v2 | LOGIN</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        body {
+            background: radial-gradient(circle at 20% 30%, #03050b, #000000);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .card {
+            background: rgba(0, 20, 30, 0.7);
+            backdrop-filter: blur(14px);
+            border: 1px solid cyan;
+            border-radius: 48px;
+            padding: 40px 32px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 0 25px cyan;
+        }
+        .card h1 {
+            color: cyan;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        input {
+            width: 100%;
+            padding: 14px;
+            margin: 12px 0;
+            background: black;
+            border: 1px solid cyan;
+            border-radius: 60px;
+            color: white;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: cyan;
+            border: none;
+            border-radius: 60px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0a6;
+            padding: 10px 20px;
+            border-radius: 60px;
+            color: white;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>⎋ NXT CORE v2</h1>
+    <input type="text" id="loginUser" placeholder="Username">
+    <input type="password" id="loginPass" placeholder="Password">
+    <button onclick="handleLogin()">⟡ LOGIN ⟡</button>
+</div>
+<div id="toastMsg" class="toast"></div>
+
+<script>
+    function loadUsers() {
+        let raw = localStorage.getItem("nxt_core_users");
+        if (!raw) {
+            let defaultUsers = [
+                { username: "zetsu", password: "QuantumTeams", role: "OWNER" },
+                { username: "admin", password: "admin123", role: "ADMIN" },
+                { username: "user", password: "user123", role: "USER" }
+            ];
+            localStorage.setItem("nxt_core_users", JSON.stringify(defaultUsers));
+            return defaultUsers;
+        }
+        return JSON.parse(raw);
+    }
+
+    function showToast(msg, isError = false) {
+        let toast = document.getElementById("toastMsg");
+        toast.innerText = msg;
+        toast.style.background = isError ? "#a22" : "#0a6";
+        toast.style.display = "block";
+        setTimeout(() => toast.style.display = "none", 2000);
+    }
+
+    function handleLogin() {
+        let username = document.getElementById("loginUser").value.trim();
+        let password = document.getElementById("loginPass").value.trim();
+        let users = loadUsers();
+        let found = users.find(u => u.username === username && u.password === password);
+        if (!found) {
+            showToast("❌ Login gagal!", true);
+            return;
+        }
+        localStorage.setItem("nxt_user", JSON.stringify(found));
+        window.location.href = "dashboard.html";
+    }
+
+    // CEK SESSION: kalau sudah login, langsung redirect ke dashboard
+    let session = localStorage.getItem("nxt_user");
+    if (session) {
+        window.location.href = "dashboard.html";
+    }
+</script>
+</body>
+</html>
