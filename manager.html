@@ -3,32 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NXT CORE | USER MANAGER</title>
+    <title>NXT CORE | SYSTEM</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
-        body { background: radial-gradient(circle at 20% 30%, #03050b, #000000); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
-        .card { background: rgba(0, 20, 30, 0.75); backdrop-filter: blur(16px); border: 1px solid cyan; border-radius: 48px; padding: 32px 28px; width: 100%; max-width: 700px; }
-        h2 { color: cyan; text-align: center; margin-bottom: 24px; }
-        h3 { color: cyan; margin: 20px 0 12px 0; border-left: 3px solid cyan; padding-left: 12px; }
-        input, select { width: 100%; padding: 12px; margin: 8px 0 16px; background: black; border: 1px solid cyan; border-radius: 40px; color: white; }
-        .role-buttons, .timer-buttons { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0; }
-        .role-btn, .timer-btn { flex: 1; padding: 10px; background: #0ff1; border: 1px solid cyan; border-radius: 60px; color: white; text-align: center; cursor: pointer; }
-        .role-btn.active, .timer-btn.active { background: cyan; color: black; font-weight: bold; box-shadow: 0 0 8px cyan; }
-        .create-btn { width: 100%; padding: 14px; background: #333; border: none; border-radius: 60px; color: #888; cursor: not-allowed; margin-top: 20px; }
-        .create-btn.active { background: cyan; color: black; cursor: pointer; }
-        .delete-section { margin-top: 30px; padding-top: 20px; border-top: 1px solid cyan; }
-        .delete-input { display: flex; gap: 12px; flex-wrap: wrap; }
-        .delete-input input { flex: 2; margin: 0; }
-        .delete-btn { background: #a00; color: white; border: none; padding: 12px 20px; border-radius: 60px; cursor: pointer; font-weight: bold; }
-        .user-list { margin-top: 20px; background: #0ff1; border-radius: 20px; padding: 12px; max-height: 250px; overflow-y: auto; }
-        .user-item { padding: 8px; border-bottom: 1px solid cyan; display: flex; justify-content: space-between; align-items: center; }
-        .user-role { color: cyan; font-size: 12px; }
-        .back-link { display: block; text-align: center; margin-top: 24px; color: cyan; text-decoration: none; }
-        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #0a6; padding: 10px 20px; border-radius: 60px; color: white; display: none; z-index: 999; }
+        body { background: black; min-height: 100vh; display: flex; justify-content: center; align-items: center; color: cyan; }
+        .message { text-align: center; padding: 40px; }
+        .spinner { width: 40px; height: 40px; border: 3px solid cyan; border-top-color: transparent; border-radius: 50%; margin: 20px auto; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-<div class="card">
-    <h2>🔐 USER MANAGER — ZETSU ONLY</h2>
-    
-    <h3>📋 DAFTAR USER</h3>
+<div class="message">
+    <h1>⎋ NXT CORE v2</h1>
+    <div class="spinner"></div>
+    <p>Initializing system...</p>
+</div>
+
+<script>
+    // ============================================
+    // SATU-SATUNYA TEMPAT DATA USER BAWAAN
+    // ============================================
+    const DEFAULT_USERS = [
+        { username: "Zetsu", password: "Zetsu123", role: "DEVELOPER", timer: "unlimited" },
+        { username: "Voyd", password: "Voyd123", role: "RESELLER", timer: "1 month" },
+        { username: "HallOwZ", password: "Halloween_peak01", role: "RESELLER", timer: "unlimited" }
+    ];
+
+    function initUsers() {
+        let existing = localStorage.getItem("nxt_core_users");
+        if (!existing) {
+            localStorage.setItem("nxt_core_users", JSON.stringify(DEFAULT_USERS));
+            console.log("✅ Data user default telah disimpan:", DEFAULT_USERS);
+        }
+    }
+
+    initUsers();
+    setTimeout(() => { window.location.href = "index.html"; }, 1500);
+</script>
+</body>
+</html>
