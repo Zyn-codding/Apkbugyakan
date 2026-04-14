@@ -28,7 +28,7 @@
             height: 100%;
             background: black;
             z-index: 1000;
-            display: flex;
+            display: none;
             justify-content: center;
             align-items: center;
             transition: opacity 0.5s;
@@ -40,6 +40,18 @@
             position: absolute;
             top: 0;
             left: 0;
+        }
+        .loading-text {
+            position: relative;
+            z-index: 2;
+            color: cyan;
+            font-size: 20px;
+            font-weight: bold;
+            background: rgba(0,0,0,0.6);
+            padding: 12px 24px;
+            border-radius: 60px;
+            backdrop-filter: blur(8px);
+            text-align: center;
         }
         .card {
             background: rgba(0, 20, 30, 0.7);
@@ -92,12 +104,22 @@
             display: none;
             z-index: 999;
         }
+        .sound-hint {
+            margin-top: 15px;
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            cursor: pointer;
+        }
+        .sound-hint:hover {
+            color: cyan;
+        }
     </style>
 </head>
 <body>
 
-<div id="loadingOverlay" class="loading-overlay" style="display: none;">
+<div id="loadingOverlay" class="loading-overlay">
     <video id="loadingVideo" class="loading-video" autoplay muted playsinline></video>
+    <div class="loading-text">⎋ NXT CORE v2 — LOADING...</div>
 </div>
 
 <div class="card">
@@ -106,24 +128,32 @@
     <input type="text" id="loginUser" placeholder="Username">
     <input type="password" id="loginPass" placeholder="Password">
     <button onclick="handleLogin()">⟡ LOGIN ⟡</button>
+    <div class="sound-hint" onclick="enableSound()">🔊 Klik di sini untuk mengaktifkan suara</div>
 </div>
 <div id="toastMsg" class="toast"></div>
 
 <script>
     const LOADING_VIDEO_URL = "https://j.top4top.io/m_3755mcrvl4.mp4";
+    let soundEnabled = false;
 
-    // DEFAULT USERS (SAMA PERSIS DENGAN MANAGER.HTML)
-    const DEFAULT_USERS = [
-        { username: "Zetsu", password: "Zetsu123", role: "DEVELOPER", timer: "unlimited" },
-        { username: "Voyd", password: "Voyd123", role: "RESELLER", timer: "1 month" },
-        { username: "HallOwZ", password: "Halloween_peak01", role: "RESELLER", timer: "unlimited" }
-    ];
+    // Fungsi untuk mengaktifkan suara (dipanggil user klik)
+    function enableSound() {
+        soundEnabled = true;
+        showToast("🔊 Suara diaktifkan! Login untuk mendengar musik loading.");
+    }
+
+    // Cek apakah user sudah pernah interaksi dengan halaman
+    document.body.addEventListener('click', function enableSoundOnClick() {
+        soundEnabled = true;
+        document.body.removeEventListener('click', enableSoundOnClick);
+        showToast("🔊 Suara diaktifkan!");
+    });
 
     function loadUsers() {
         let raw = localStorage.getItem("nxt_core_users");
         if (!raw) {
-            localStorage.setItem("nxt_core_users", JSON.stringify(DEFAULT_USERS));
-            return [...DEFAULT_USERS];
+            window.location.href = "manager.html";
+            return [];
         }
         return JSON.parse(raw);
     }
@@ -139,12 +169,21 @@
     function showLoadingVideo(callback) {
         let overlay = document.getElementById("loadingOverlay");
         let video = document.getElementById("loadingVideo");
+        
+        // Setel volume dan unmute kalau suara sudah diaktifkan
+        video.volume = 0.7;
+        if (soundEnabled) {
+            video.muted = false;
+        } else {
+            video.muted = true;
+        }
+        
         overlay.style.display = "flex";
         video.src = LOADING_VIDEO_URL;
         video.load();
         
         video.oncanplay = () => {
-            video.play().catch(e => console.log("autoplay blocked"));
+            video.play().catch(e => console.log("play error:", e));
             let duration = video.duration || 3;
             setTimeout(callback, duration * 1000);
         };
@@ -157,6 +196,9 @@
         let username = document.getElementById("loginUser").value.trim();
         let password = document.getElementById("loginPass").value.trim();
         let users = loadUsers();
+        
+        if (users.length === 0) return;
+        
         let found = users.find(u => u.username === username && u.password === password);
         if (!found) {
             showToast("❌ Login gagal!", true);
@@ -169,7 +211,9 @@
     }
 
     let session = localStorage.getItem("nxt_user");
-    if (session) window.location.href = "dashboard.html";
+    if (session) {
+        window.location.href = "dashboard.html";
+    }
 </script>
 </body>
 </html>
