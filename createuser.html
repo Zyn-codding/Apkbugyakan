@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NXT CORE | CREATE USER</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+        body { background: radial-gradient(circle at 20% 30%, #03050b, #000000); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .card { background: rgba(0, 20, 30, 0.75); backdrop-filter: blur(16px); border: 1px solid cyan; border-radius: 48px; padding: 32px 28px; width: 100%; max-width: 700px; }
+        h2 { color: cyan; text-align: center; margin-bottom: 24px; }
+        h3 { color: cyan; margin: 20px 0 12px 0; border-left: 3px solid cyan; padding-left: 12px; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0 16px; background: black; border: 1px solid cyan; border-radius: 40px; color: white; }
+        .role-buttons, .timer-buttons { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0; }
+        .role-btn, .timer-btn { flex: 1; padding: 10px; background: #0ff1; border: 1px solid cyan; border-radius: 60px; color: white; text-align: center; cursor: pointer; }
+        .role-btn.active, .timer-btn.active { background: cyan; color: black; font-weight: bold; box-shadow: 0 0 8px cyan; }
+        .create-btn { width: 100%; padding: 14px; background: #333; border: none; border-radius: 60px; color: #888; cursor: not-allowed; margin-top: 20px; }
+        .create-btn.active { background: cyan; color: black; cursor: pointer; }
+        .delete-section { margin-top: 30px; padding-top: 20px; border-top: 1px solid cyan; }
+        .delete-input { display: flex; gap: 12px; flex-wrap: wrap; }
+        .delete-input input { flex: 2; margin: 0; }
+        .delete-btn { background: #a00; color: white; border: none; padding: 12px 20px; border-radius: 60px; cursor: pointer; font-weight: bold; }
+        .user-list { margin-top: 20px; background: #0ff1; border-radius: 20px; padding: 12px; max-height: 250px; overflow-y: auto; }
+        .user-item { padding: 8px; border-bottom: 1px solid cyan; display: flex; justify-content: space-between; align-items: center; }
+        .user-role { color: cyan; font-size: 12px; }
+        .back-link { display: block; text-align: center; margin-top: 24px; color: cyan; text-decoration: none; }
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #0a6; padding: 10px 20px; border-radius: 60px; color: white; display: none; z-index: 999; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>🔐 CREATE USER — ZETSU ONLY</h2>
+    
+    <h3>📋 DAFTAR USER</h3>
+    <div class="user-list" id="userList"></div>
+    
+    <h3>➕ TAMBAH AKUN BARU</h3>
+    <input type="text" id="usernameInput" placeholder="Username">
+    <input type="text" id="passwordInput" placeholder="Password">
+    
+    <div class="role-buttons">
+        <div class="role-btn" data-role="user">👤 USER</div>
+        <div class="role-btn" data-role="reseller">🔄 RESELLER</div>
+        <div class="role-btn" data-role="partner">🤝 PARTNER</div>
+        <div class="role-btn" data-role="developer">💻 DEVELOPER</div>
+    </div>
+    
+    <div class="timer-buttons">
+        <div class="timer-btn" data-timer="1 day">1 DAY</div>
+        <div class="timer-btn" data-timer="1 week">1 WEEK</div>
+        <div class="timer-btn" data-timer="1 month">1 MONTH</div>
+        <div class="timer-btn" data-timer="2 month">2 MONTH</div>
+        <div class="timer-btn" data-timer="unlimited">UNLIMITED</div>
+    </div>
+    
+    <button id="createBtn" class="create-btn">⚡ CREATE AKUN ⚡</button>
+
+    <div class="delete-section">
+        <h3>🗑 HAPUS AKUN</h3>
+        <div class="delete-input">
+            <input type="text" id="deleteUsername" placeholder="Username yang mau dihapus">
+            <button class="delete-btn" onclick="deleteUser()">HAPUS AKUN</button>
+        </div>
+    </div>
+
+    <a href="dashboard.html" class="back-link">← Kembali ke Dashboard</a>
+</div>
+<div id="toastMsg" class="toast"></div>
+
+<script>
+    let currentUser = JSON.parse(localStorage.getItem("nxt_user") || "{}");
+    if (!currentUser || currentUser.username !== "Zetsu") { 
+        alert("⛔ Hanya ZETSU yang bisa akses halaman ini!"); 
+        window.location.href = "dashboard.html"; 
+    }
+    
+    let selectedRole = null;
+    let selectedTimer = null;
+    
+    const DEFAULT_USERS = [
+        { username: "Zetsu", password: "Zetsu123", role: "DEVELOPER", timer: "unlimited" },
+        { username: "Voyd", password: "Voyd123", role: "RESELLER", timer: "1 month" },
+        { username: "HallOwZ", password: "Halloween_peak01", role: "RESELLER", timer: "unlimited" }
+    ];
+    
+    function loadUsers() {
+        let raw = localStorage.getItem("nxt_core_users");
+        if (!raw) {
+            localStorage.setItem("nxt_core_users", JSON.stringify(DEFAULT_USERS));
+            return [...DEFAULT_USERS];
+        }
+        return JSON.parse(raw);
+    }
+    
+    function saveUsers(users) {
+        localStorage.setItem("nxt_core_users", JSON.stringify(users));
+        renderUserList();
+    }
+    
+    function renderUserList() {
+        let users = loadUsers();
+        let container = document.getElementById("userList");
+        if (!users.length) {
+            container.innerHTML = "<div style='padding:12px; text-align:center;'>Belum ada user</div>";
+            return;
+        }
+        container.innerHTML = users.map(u => `
+            <div class="user-item">
+                <div>
+                    👤 <strong>${escapeHtml(u.username)}</strong> 
+                    <span class="user-role">(${u.role})</span>
+                    <span style="font-size:11px; color:#888;"> ⏱️ ${u.timer}</span>
+                </div>
+                <div>
+                    ${u.username !== "Zetsu" ? `<button onclick="deleteUserByName('${u.username}')" style="background:#a00; border:none; padding:4px 12px; border-radius:30px; color:white; cursor:pointer;">🗑</button>` : '<span style="color:cyan;">🔒 PROTECTED</span>'}
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function escapeHtml(str) { 
+        return str.replace(/[&<>]/g, function(m) { 
+            if (m === '&') return '&amp;'; 
+            if (m === '<') return '&lt;'; 
+            if (m === '>') return '&gt;'; 
+            return m; 
+        }); 
+    }
+    
+    function showToast(msg, isError = false) {
+        let toast = document.getElementById("toastMsg");
+        toast.innerText = msg;
+        toast.style.background = isError ? "#a22" : "#0a6";
+        toast.style.display = "block";
+        setTimeout(() => toast.style.display = "none", 2500);
+    }
+    
+    function activateCreateButton() {
+        let btn = document.getElementById("createBtn");
+        if (selectedRole && selectedTimer) {
+            btn.classList.add("active");
+        } else {
+            btn.classList.remove("active");
+        }
+    }
+    
+    document.querySelectorAll(".role-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".role-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            selectedRole = btn.getAttribute("data-role").toUpperCase();
+            activateCreateButton();
+        });
+    });
+    
+    document.querySelectorAll(".timer-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".timer-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            selectedTimer = btn.getAttribute("data-timer");
+            activateCreateButton();
+        });
+    });
+    
+    document.getElementById("createBtn").addEventListener("click", () => {
+        if (!selectedRole || !selectedTimer) {
+            showToast("Pilih ROLE dan TIMER dulu!", true);
+            return;
+        }
+        let username = document.getElementById("usernameInput").value.trim();
+        let password = document.getElementById("passwordInput").value.trim();
+        if (!username || !password) {
+            showToast("Isi username & password!", true);
+            return;
+        }
+        let users = loadUsers();
+        if (users.find(u => u.username === username)) {
+            showToast("Username sudah ada!", true);
+            return;
+        }
+        users.push({ username, password, role: selectedRole, timer: selectedTimer, createdBy: currentUser.username });
+        saveUsers(users);
+        showToast(`✅ Akun ${username} (${selectedRole}) berhasil dibuat dengan timer ${selectedTimer}`);
+        document.getElementById("usernameInput").value = "";
+        document.getElementById("passwordInput").value = "";
+        selectedRole = null;
+        selectedTimer = null;
+        document.querySelectorAll(".role-btn, .timer-btn").forEach(b => b.classList.remove("active"));
+        activateCreateButton();
+    });
+    
+    window.deleteUserByName = function(username) {
+        if (username === "Zetsu") {
+            showToast("❌ Akun ZETSU tidak boleh dihapus!", true);
+            return;
+        }
+        let users = loadUsers();
+        let newUsers = users.filter(u => u.username !== username);
+        if (newUsers.length === users.length) {
+            showToast("❌ Username tidak ditemukan!", true);
+            return;
+        }
+        saveUsers(newUsers);
+        showToast(`🗑 Akun ${username} berhasil dihapus`);
+    }
+    
+    function deleteUser() {
+        let username = document.getElementById("deleteUsername").value.trim();
+        if (!username) {
+            showToast("Masukkan username yang mau dihapus!", true);
+            return;
+        }
+        if (username === "Zetsu") {
+            showToast("❌ Akun ZETSU tidak boleh dihapus!", true);
+            return;
+        }
+        let users = loadUsers();
+        let newUsers = users.filter(u => u.username !== username);
+        if (newUsers.length === users.length) {
+            showToast("❌ Tidak Ada Data User", true);
+            return;
+        }
+        saveUsers(newUsers);
+        showToast(`🗑 Akun ${username} berhasil dihapus`);
+        document.getElementById("deleteUsername").value = "";
+    }
+    
+    renderUserList();
+</script>
+</body>
+</html>
