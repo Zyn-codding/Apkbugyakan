@@ -112,16 +112,18 @@
 <script>
     const LOADING_VIDEO_URL = "https://j.top4top.io/m_3755mcrvl4.mp4";
 
+    // DEFAULT USERS (SAMA PERSIS DENGAN MANAGER.HTML)
+    const DEFAULT_USERS = [
+        { username: "Zetsu", password: "Zetsu123", role: "DEVELOPER", timer: "unlimited" },
+        { username: "Voyd", password: "Voyd123", role: "RESELLER", timer: "1 month" },
+        { username: "HallOwZ", password: "Halloween_peak01", role: "RESELLER", timer: "unlimited" }
+    ];
+
     function loadUsers() {
         let raw = localStorage.getItem("nxt_core_users");
         if (!raw) {
-            let defaultUsers = [
-                { username: "zetsu", password: "zetsu123", role: "OWNER", timer: "unlimited" },
-                { username: "admin", password: "admin123", role: "ADMIN", timer: "unlimited" },
-                { username: "user", password: "user123", role: "USER", timer: "unlimited" }
-            ];
-            localStorage.setItem("nxt_core_users", JSON.stringify(defaultUsers));
-            return defaultUsers;
+            localStorage.setItem("nxt_core_users", JSON.stringify(DEFAULT_USERS));
+            return [...DEFAULT_USERS];
         }
         return JSON.parse(raw);
     }
@@ -141,10 +143,9 @@
         video.src = LOADING_VIDEO_URL;
         video.load();
         
-        let duration = 3;
         video.oncanplay = () => {
             video.play().catch(e => console.log("autoplay blocked"));
-            duration = video.duration || 3;
+            let duration = video.duration || 3;
             setTimeout(callback, duration * 1000);
         };
         video.onerror = () => {
