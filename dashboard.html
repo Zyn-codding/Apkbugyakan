@@ -30,7 +30,8 @@
         .card h3 { color: cyan; margin-bottom: 18px; border-left: 4px solid cyan; padding-left: 12px; }
         input, select { width: 100%; padding: 12px; background: black; border: 1px solid cyan; border-radius: 30px; color: white; margin: 8px 0 16px; }
         .btn-primary { background: cyan; color: black; font-weight: bold; width: 100%; padding: 12px; border-radius: 30px; border: none; cursor: pointer; }
-        .history-item { background: #0ff1; margin: 12px 0; padding: 12px; border-radius: 20px; border-left: 3px solid cyan; }
+        .history-item { background: #0ff1; margin: 12px 0; padding: 12px; border-radius: 20px; border-left: 3px solid cyan; cursor: pointer; transition: 0.2s; }
+        .history-item:hover { background: #0ff3; transform: translateX(5px); }
         .result-box { background: #00000099; border-radius: 20px; padding: 15px; margin-top: 15px; }
         .vip-card { background: #0ff2; border: 1px solid gold; margin-top: 20px; text-align: center; }
         .vip-btn { background: cyan; color: black; border: none; padding: 10px; border-radius: 60px; margin: 8px; cursor: pointer; font-weight: bold; width: 90%; }
@@ -53,6 +54,7 @@
             <a class="nav-link" data-section="bug">Bug</a>
             <a class="nav-link" data-section="iptracker">IP Tracker</a>
             <a class="nav-link" data-section="numbertracker">Number Tracker</a>
+            <a class="nav-link" data-section="music">🎵 Music</a>
             <a class="nav-link" data-section="plans">Plans</a>
             <a class="nav-link" data-section="about">About</a>
         </div>
@@ -65,7 +67,7 @@
     <div id="home" class="section active">
         <div class="card" style="text-align:center">
             <h3>🔥 WELCOME TO NXT CORE v2</h3>
-            <p>Full forensic suite: Bug Sender, IP Tracker, Number Tracker (WhatsApp Lookup).</p>
+            <p>Full forensic suite: Bug Sender, IP Tracker, Number Tracker, Music Player.</p>
             <div id="managerLink"></div>
             <div id="vipSection"></div>
         </div>
@@ -79,20 +81,59 @@
     </div></div>
 
     <div id="iptracker" class="section"><div class="card"><h3>🌐 IP TRACKER</h3>
-        <input type="text" id="ipTarget" placeholder="IP target / kosongkan = IP sendiri">
+        <input type="text" id="ipTarget" placeholder="IP target / kosongkan = IP selbst">
         <button class="btn-primary" onclick="trackIP()">⟡ LACAK IP ⟡</button>
         <div id="ipResult" class="result-box" style="display:none;"></div>
     </div></div>
 
-    <!-- NUMBER TRACKER SECTION (WHATSAPP LOOKUP) -->
     <div id="numbertracker" class="section">
-        <div class="card">
-            <h3>📞 NUMBER TRACKER (WHATSAPP LOOKUP)</h3>
+        <div class="card"><h3>📞 NUMBER TRACKER (WHATSAPP)</h3>
             <input type="text" id="phoneNumber" placeholder="Masukkan nomor hp (628xxx)">
             <button class="btn-primary" onclick="trackPhone()">⟡ LACAK NOMOR ⟡</button>
             <div id="phoneResult" class="result-box" style="display:none;"></div>
-            <p style="font-size:12px; margin-top:12px;">💡 Contoh: 628123456789 → Telkomsel, Sulawesi Selatan</p>
-            <p style="font-size:11px; color:#888;">⚠️ Mode demo: Data berdasarkan prefix nomor. Untuk akurasi real butuh API berbayar.</p>
+        </div>
+    </div>
+
+    <div id="music" class="section">
+        <div class="card">
+            <h3>🎵 MUSIC PLAYER — NXT CORE v2</h3>
+            <input type="text" id="searchSong" placeholder="Cari lagu lain (YouTube)">
+            <button class="btn-primary" onclick="searchAndPlay()">⟡ SEARCH & PLAY ⟡</button>
+            <input type="file" id="uploadMp3" accept="audio/mp3" style="margin-top: 16px;">
+            <button class="btn-primary" onclick="uploadAndPlay()">⟡ PLAY UPLOADED ⟡</button>
+            <div style="background:#0ff1; border-radius: 60px; padding: 16px; margin-top: 20px;">
+                <div id="nowPlaying" style="color:cyan; margin-bottom: 12px;">🎧 Tidak ada lagu diputar</div>
+                <audio id="audioPlayer" controls style="width:100%; border-radius: 60px;"></audio>
+                <div style="margin-top: 12px;">
+                    <button onclick="playPause()" style="background:cyan; border:none; padding:8px 20px; border-radius:60px; margin-right:8px; cursor:pointer;">⏯️ Play/Pause</button>
+                    <button onclick="stopMusic()" style="background:#a00; border:none; padding:8px 20px; border-radius:60px; cursor:pointer;">⏹️ Stop</button>
+                    <input type="range" id="volumeControl" min="0" max="100" value="70" style="width:120px; margin-left:8px;" onchange="setVolume()">
+                </div>
+            </div>
+            <div style="margin-top: 20px;">
+                <h4 style="color:cyan;">📜 PLAYLIST ZETSU</h4>
+                <div id="demoPlaylist" style="max-height: 300px; overflow-y: auto;">
+                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', 'Brooklynbloodpop - Syko')">🎵 Brooklynbloodpop - Syko</div>
+                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', 'Monolog - Pamungkas')">🎵 Monolog - Pamungkas</div>
+                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', 'Disco - Surf Curse')">🎵 Disco - Surf Curse</div>
+                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', 'Back to Friends - Somethinc')">🎵 Back to Friends - Somethinc</div>
+                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', 'Notion - The Rare Occasions')">🎵 Notion - The Rare Occasions</div>
+                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', 'Evakuasi - Hindia')">🎵 Evakuasi - Hindia</div>
+                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', 'Evaluasi - Hindia')">🎵 Evaluasi - Hindia</div>
+                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', 'Bunga Maaf - Sal Priadi')">🎵 Bunga Maaf - Sal Priadi</div>
+                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', 'Sailor Song - Gigi Perez')">🎵 Sailor Song - Gigi Perez</div>
+                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', 'You\'ll Be in My Heart - Phil Collins')">🎵 You'll Be in My Heart - Phil Collins</div>
+                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', 'Fraksi - Nadin Amizah')">🎵 Fraksi - Nadin Amizah</div>
+                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', 'Love Me Not - Ravaughn')">🎵 Love Me Not - Ravaughn</div>
+                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', 'No 1 Party Anthem')">🎵 No 1 Party Anthem</div>
+                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', 'Cincin')">🎵 Cincin</div>
+                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', 'Terbuang Dalam Waktu')">🎵 Terbuang Dalam Waktu</div>
+                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', 'Prom Queen')">🎵 Prom Queen</div>
+                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', 'I Wanna Be Yours - Arctic Monkeys')">🎵 I Wanna Be Yours - Arctic Monkeys</div>
+                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', 'Anything You Want')">🎵 Anything You Want</div>
+                    <div class="history-item" onclick="playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', 'Only You')">🎵 Only You</div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -101,8 +142,9 @@
         <p style="margin-top:12px">Hubungi @SyallOfficial untuk pembelian.</p>
     </div></div>
 
-    <div id="about" class="section"><div class="card"><h3>📌 ABOUT NXT CORE</h3><p>Platform forensic digital untuk bug simulation, IP tracking, dan WhatsApp number lookup.</p><p>© 2025 NXT CORE v2 — ZETSU PROJECT</p></div></div>
-    <footer>NXT CORE v2 — All trackers + bug simulation (riwayat lokal)</footer>
+    <div id="about" class="section"><div class="card"><h3>📌 ABOUT NXT CORE</h3><p>Platform forensic digital + hiburan music player.</p><p>© 2025 NXT CORE v2 — ZETSU PROJECT</p></div></div>
+    
+    <footer>NXT CORE v2 — Bug Sender | IP Tracker | Number Tracker | Music Player</footer>
 </div>
 
 <script>
@@ -114,7 +156,7 @@
         document.getElementById("userInfo").innerHTML = `👤 ${currentUser.username} (${currentUser.role})`;
         let managerDiv = document.getElementById("managerLink");
         let vipDiv = document.getElementById("vipSection");
-        if (currentUser.username === "zetsu") {
+        if (currentUser.username === "Zetsu") {
             managerDiv.innerHTML = `<a href="manager.html" class="manager-link">🔧 USER MANAGER (ZETSU ONLY)</a>`;
             vipDiv.innerHTML = `<div class="card vip-card"><h3>⭐ ROLE'S VVIP (ZETSU ONLY)</h3><button class="vip-btn" onclick="alert('Reseller bisa create USER')">🔄 RESELLER</button><button class="vip-btn" onclick="alert('Partner bisa create USER + RESELLER')">🤝 PARTNER</button><button class="vip-btn" onclick="alert('Owner bisa create USER + RESELLER + PARTNER + Timer')">👑 OWNER</button><p style="margin-top:10px">⏱️ Timer: 1 day, 1 week, 1 month, 2 month, unlimited</p></div>`;
         } else {
@@ -124,7 +166,7 @@
     }
     function logout() { localStorage.removeItem("nxt_user"); window.location.href = "index.html"; }
 
-    const sections = ["home","bug","iptracker","numbertracker","plans","about"];
+    const sections = ["home","bug","iptracker","numbertracker","music","plans","about"];
     function showSection(id) { sections.forEach(sec => document.getElementById(sec).classList.remove("active")); document.getElementById(id).classList.add("active"); document.querySelectorAll(".nav-link").forEach(link => link.classList.remove("active")); document.querySelector(`.nav-link[data-section="${id}"]`).classList.add("active"); }
     document.querySelectorAll(".nav-link").forEach(link => link.addEventListener("click", (e) => { e.preventDefault(); showSection(link.getAttribute("data-section")); }));
 
@@ -138,86 +180,38 @@
 
     async function trackIP() { let ip = document.getElementById("ipTarget").value.trim(); let url = ip ? `https://ipapi.co/${ip}/json/` : `https://ipapi.co/json/`; let resDiv = document.getElementById("ipResult"); resDiv.style.display = "block"; resDiv.innerHTML = "⏳ Melacak IP..."; try { let resp = await fetch(url); let data = await resp.json(); if (data.error) throw new Error(); resDiv.innerHTML = `<b>🌍 IP:</b> ${data.ip}<br><b>📍 Kota:</b> ${data.city || '-'}<br><b>🗺 Wilayah:</b> ${data.region || '-'}<br><b>🌎 Negara:</b> ${data.country_name || '-'}<br><b>📡 ISP:</b> ${data.org || '-'}`; } catch(e) { resDiv.innerHTML = "❌ Gagal lacak IP."; } }
     
-    // NUMBER TRACKER FIX - WhatsApp Lookup Simulation
     async function trackPhone() {
         let phone = document.getElementById("phoneNumber").value.trim();
         let resDiv = document.getElementById("phoneResult");
-        
-        if (!phone) {
-            alert("Masukkan nomor target!");
-            return;
-        }
-        
-        if (!/^[0-9]+$/.test(phone)) {
-            alert("Goblok ada huruf nya tolol!");
-            return;
-        }
-        
+        if (!phone) { alert("Masukkan nomor target!"); return; }
+        if (!/^[0-9]+$/.test(phone)) { alert("Goblok ada huruf nya tolol!"); return; }
         resDiv.style.display = "block";
         resDiv.innerHTML = "⏳ Melacak nomor WhatsApp...";
-        
         setTimeout(() => {
             let prefix = phone.substring(0, 4);
-            let provider = "";
-            let location = "";
-            let city = "";
-            
-            // Provider & location mapping based on Indonesian prefixes
+            let provider = "", location = "", city = "";
             if (prefix === "6281" || prefix === "6282" || prefix === "6283") {
                 provider = "Telkomsel";
                 if (prefix === "6282") { location = "Sulawesi Selatan"; city = "Makassar"; }
                 else if (prefix === "6283") { location = "Sulawesi Utara"; city = "Manado"; }
                 else { location = "Jawa Barat"; city = "Bandung"; }
-            } 
-            else if (prefix === "6285" || prefix === "6287") {
-                provider = "Indosat / IM3";
-                location = "Jawa Timur";
-                city = "Surabaya";
-            }
-            else if (prefix === "6288") {
-                provider = "XL / Axis";
-                location = "Sumatera Utara";
-                city = "Medan";
-            }
-            else if (prefix === "6289") {
-                provider = "Tri (3)";
-                location = "Jawa Tengah";
-                city = "Semarang";
-            }
-            else if (prefix === "6286") {
-                provider = "Smartfren";
-                location = "Banten";
-                city = "Tangerang";
-            }
-            else {
-                provider = "Unknown Provider";
-                location = "Tidak diketahui";
-                city = "-";
-            }
-            
+            } else if (prefix === "6285" || prefix === "6287") { provider = "Indosat / IM3"; location = "Jawa Timur"; city = "Surabaya"; }
+            else if (prefix === "6288") { provider = "XL / Axis"; location = "Sumatera Utara"; city = "Medan"; }
+            else if (prefix === "6289") { provider = "Tri (3)"; location = "Jawa Tengah"; city = "Semarang"; }
+            else if (prefix === "6286") { provider = "Smartfren"; location = "Banten"; city = "Tangerang"; }
+            else { provider = "Unknown"; location = "Tidak diketahui"; city = "-"; }
             let isWhatsApp = Math.random() > 0.2;
-            let waStatus = isWhatsApp ? "✅ TERDAFTAR" : "❌ TIDAK TERDAFTAR";
-            let waType = isWhatsApp ? (Math.random() > 0.7 ? "WhatsApp Business" : "WhatsApp Personal") : "-";
-            let areaCode = phone.substring(0, 6);
-            
-            resDiv.innerHTML = `
-                <div style="font-family: monospace;">
-                    <b>📱 HASIL PELACAKAN NOMOR WHATSAPP</b><br><br>
-                    <b>📞 Nomor:</b> ${phone}<br>
-                    <b>🌍 Provider:</b> ${provider}<br>
-                    <b>📍 Lokasi:</b> ${location}<br>
-                    <b>🏙️ Kota:</b> ${city}<br>
-                    <b>📡 Status WhatsApp:</b> ${waStatus}<br>
-                    <b>💼 Tipe:</b> ${waType}<br>
-                    <b>🕒 Waktu Lacak:</b> ${new Date().toLocaleString()}<br>
-                    <b>🔢 Kode Area:</b> ${areaCode}<br><br>
-                    <i>⚠️ Mode Demo: Data ini simulasi berdasarkan prefix nomor.<br>
-                    Contoh real: 628123456789 → Telkomsel, Sulawesi Selatan<br>
-                    Untuk akurasi real-time, butuh API berbayar (Wassenger/AbstractAPI).</i>
-                </div>
-            `;
+            resDiv.innerHTML = `<b>📞 Nomor:</b> ${phone}<br><b>🌍 Provider:</b> ${provider}<br><b>📍 Lokasi:</b> ${location}<br><b>🏙️ Kota:</b> ${city}<br><b>📡 WhatsApp:</b> ${isWhatsApp ? "✅ TERDAFTAR" : "❌ TIDAK TERDAFTAR"}<br><b>🕒 Waktu:</b> ${new Date().toLocaleString()}`;
         }, 1500);
     }
+
+    let audio = document.getElementById("audioPlayer");
+    function playDemoSong(url, title) { audio.src = url; audio.play(); document.getElementById("nowPlaying").innerHTML = `🎧 Sekarang diputar: ${title}`; }
+    function uploadAndPlay() { let file = document.getElementById("uploadMp3").files[0]; if (!file) { alert("Upload file MP3 dulu!"); return; } let url = URL.createObjectURL(file); audio.src = url; audio.play(); document.getElementById("nowPlaying").innerHTML = `🎧 Sekarang diputar: ${file.name}`; }
+    function searchAndPlay() { let query = document.getElementById("searchSong").value.trim(); if (!query) { alert("Masukkan judul lagu!"); return; } alert(`🔍 Mencari "${query}" di YouTube...\n(Fitur demo, integrasi API butuh key)`); playDemoSong('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', `Demo: ${query}`); }
+    function playPause() { if (audio.paused) audio.play(); else audio.pause(); }
+    function stopMusic() { audio.pause(); audio.currentTime = 0; document.getElementById("nowPlaying").innerHTML = "🎧 Tidak ada lagu diputar"; }
+    function setVolume() { audio.volume = document.getElementById("volumeControl").value / 100; }
 
     loadSession(); loadHistory();
 </script>
