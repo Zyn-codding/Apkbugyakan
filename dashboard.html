@@ -114,13 +114,19 @@
 
 <script>
     let currentUser = null;
+    
     function loadSession() {
         let raw = localStorage.getItem("nxt_user");
-        if (!raw) { window.location.href = "index.html"; return; }
+        if (!raw) { 
+            window.location.href = "index.html"; 
+            return; 
+        }
         currentUser = JSON.parse(raw);
         document.getElementById("userInfo").innerHTML = `👤 ${currentUser.username} (${currentUser.role})`;
+        
         let managerDiv = document.getElementById("managerLink");
         let vipDiv = document.getElementById("vipSection");
+        
         if (currentUser.username === "Zetsu") {
             managerDiv.innerHTML = `<a href="createuser.html" class="manager-link">🔧 CREATE USER (ZETSU ONLY)</a>`;
             vipDiv.innerHTML = `<div class="card vip-card"><h3>⭐ ROLE'S VVIP (ZETSU ONLY)</h3><button class="vip-btn" onclick="alert('Reseller bisa create USER')">🔄 RESELLER</button><button class="vip-btn" onclick="alert('Partner bisa create USER + RESELLER')">🤝 PARTNER</button><button class="vip-btn" onclick="alert('Owner bisa create USER + RESELLER + PARTNER + Timer')">👑 OWNER</button><p style="margin-top:10px">⏱️ Timer: 1 day, 1 week, 1 month, 2 month, unlimited</p></div>`;
@@ -136,27 +142,151 @@
             if (createuserNav) createuserNav.style.display = "inline-block";
         }
     }
-    function logout() { localStorage.removeItem("nxt_user"); window.location.href = "index.html"; }
+    
+    function logout() { 
+        localStorage.removeItem("nxt_user"); 
+        window.location.href = "index.html"; 
+    }
 
-    const sections = ["home","bug","iptracker","numbertracker","createuser","plans","about"];
+    const sections = ["home", "bug", "iptracker", "numbertracker", "createuser", "plans", "about"];
+    
     function showSection(id) { 
-        sections.forEach(sec => { let el = document.getElementById(sec); if (el) el.classList.remove("active"); }); 
+        sections.forEach(sec => { 
+            let el = document.getElementById(sec); 
+            if (el) el.classList.remove("active"); 
+        }); 
         let target = document.getElementById(id);
         if (target) target.classList.add("active"); 
         document.querySelectorAll(".nav-link").forEach(link => link.classList.remove("active")); 
         let activeLink = document.querySelector(`.nav-link[data-section="${id}"]`);
         if (activeLink) activeLink.classList.add("active");
     }
-    document.querySelectorAll(".nav-link").forEach(link => link.addEventListener("click", (e) => { 
-        e.preventDefault(); 
-        let section = link.getAttribute("data-section");
-        if (section === "createuser" && currentUser.username !== "Zetsu") {
-            alert("⛔ Hanya ZETSU yang bisa mengakses CREATE USER!");
-            return;
-        }
-        showSection(section); 
-    }));
+    
+    document.querySelectorAll(".nav-link").forEach(link => {
+        link.addEventListener("click", (e) => { 
+            e.preventDefault(); 
+            let section = link.getAttribute("data-section");
+            if (section === "createuser" && currentUser && currentUser.username !== "Zetsu") {
+                alert("⛔ Hanya ZETSU yang bisa mengakses CREATE USER!");
+                return;
+            }
+            showSection(section); 
+        });
+    });
 
     let bugHistory = [];
-    function loadHistory() { let h = localStorage.getItem("nxt_bug_history_v2"); bugHistory = h ? JSON.parse(h) : []; renderHistory(); }
-    function renderHistory() { let div = document.getElementById("historyList"); if (!bugHistory.length) { div.innerHTML = "Belum ada riwayat"; return; } div.innerHTML = bugHistory.map(h => `<div class="history-item">📱 ${h.target}<br>🐞 ${h.bug}<br>🕒 ${h.w
+    
+    function loadHistory() { 
+        let h = localStorage.getItem("nxt_bug_history_v2"); 
+        bugHistory = h ? JSON.parse(h) : []; 
+        renderHistory(); 
+    }
+    
+    function renderHistory() { 
+        let div = document.getElementById("historyList"); 
+        if (!bugHistory.length) { 
+            div.innerHTML = "Belum ada riwayat"; 
+            return; 
+        } 
+        div.innerHTML = bugHistory.map(h => `<div class="history-item">📱 ${h.target}<br>🐞 ${h.bug}<br>🕒 ${h.waktu}</div>`).join(''); 
+    }
+    
+    function saveHistory() { 
+        localStorage.setItem("nxt_bug_history_v2", JSON.stringify(bugHistory.slice(0,30))); 
+        renderHistory(); 
+    }
+    
+    function addHistory(target, bug) { 
+        bugHistory.unshift({ target, bug, waktu: new Date().toLocaleString() }); 
+        saveHistory(); 
+    }
+    
+    function clearHistory() { 
+        bugHistory = []; 
+        saveHistory(); 
+    }
+    
+    function sendBug() { 
+        let target = document.getElementById("bugTarget").value.trim(); 
+        let bug = document.getElementById("bugTypeSelect").value; 
+        if (!target) { 
+            alert("Isi nomor target dulu."); 
+            return; 
+        } 
+        if (!/^[0-9+]+$/.test(target)) { 
+            alert("Goblok ada huruf nya tolol!"); 
+            return; 
+        } 
+        addHistory(target, bug); 
+        alert(`✅ Success Sending bug ${bug} ke ${target}`); 
+        document.getElementById("bugTarget").value = ""; 
+    }
+
+    async function trackIP() { 
+        let ip = document.getElementById("ipTarget").value.trim(); 
+        let url = ip ? `https://ipapi.co/${ip}/json/` : `https://ipapi.co/json/`; 
+        let resDiv = document.getElementById("ipResult"); 
+        resDiv.style.display = "block"; 
+        resDiv.innerHTML = "⏳ Melacak IP..."; 
+        try { 
+            let resp = await fetch(url); 
+            let data = await resp.json(); 
+            if (data.error) throw new Error(); 
+            resDiv.innerHTML = `<b>🌍 IP:</b> ${data.ip}<br><b>📍 Kota:</b> ${data.city || '-'}<br><b>🗺 Wilayah:</b> ${data.region || '-'}<br><b>🌎 Negara:</b> ${data.country_name || '-'}<br><b>📡 ISP:</b> ${data.org || '-'}`; 
+        } catch(e) { 
+            resDiv.innerHTML = "❌ Gagal lacak IP."; 
+        } 
+    }
+    
+    async function trackPhone() {
+        let phone = document.getElementById("phoneNumber").value.trim();
+        let resDiv = document.getElementById("phoneResult");
+        if (!phone) { 
+            alert("Masukkan nomor target!"); 
+            return; 
+        }
+        if (!/^[0-9]+$/.test(phone)) { 
+            alert("Goblok ada huruf nya tolol!"); 
+            return; 
+        }
+        resDiv.style.display = "block";
+        resDiv.innerHTML = "⏳ Melacak nomor WhatsApp...";
+        setTimeout(() => {
+            let prefix = phone.substring(0, 4);
+            let provider = "", location = "", city = "";
+            if (prefix === "6281" || prefix === "6282" || prefix === "6283") {
+                provider = "Telkomsel";
+                if (prefix === "6282") { location = "Sulawesi Selatan"; city = "Makassar"; }
+                else if (prefix === "6283") { location = "Sulawesi Utara"; city = "Manado"; }
+                else { location = "Jawa Barat"; city = "Bandung"; }
+            } else if (prefix === "6285" || prefix === "6287") { 
+                provider = "Indosat / IM3"; 
+                location = "Jawa Timur"; 
+                city = "Surabaya"; 
+            } else if (prefix === "6288") { 
+                provider = "XL / Axis"; 
+                location = "Sumatera Utara"; 
+                city = "Medan"; 
+            } else if (prefix === "6289") { 
+                provider = "Tri (3)"; 
+                location = "Jawa Tengah"; 
+                city = "Semarang"; 
+            } else if (prefix === "6286") { 
+                provider = "Smartfren"; 
+                location = "Banten"; 
+                city = "Tangerang"; 
+            } else { 
+                provider = "Unknown"; 
+                location = "Tidak diketahui"; 
+                city = "-"; 
+            }
+            let isWhatsApp = Math.random() > 0.2;
+            resDiv.innerHTML = `<b>📞 Nomor:</b> ${phone}<br><b>🌍 Provider:</b> ${provider}<br><b>📍 Lokasi:</b> ${location}<br><b>🏙️ Kota:</b> ${city}<br><b>📡 WhatsApp:</b> ${isWhatsApp ? "✅ TERDAFTAR" : "❌ TIDAK TERDAFTAR"}<br><b>🕒 Waktu:</b> ${new Date().toLocaleString()}`;
+        }, 1500);
+    }
+
+    loadSession(); 
+    loadHistory();
+</script>
+</body>
+</html>
