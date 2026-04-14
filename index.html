@@ -31,7 +31,6 @@
             display: none;
             justify-content: center;
             align-items: center;
-            transition: opacity 0.5s;
         }
         .loading-video {
             width: 100%;
@@ -51,7 +50,6 @@
             padding: 12px 24px;
             border-radius: 60px;
             backdrop-filter: blur(8px);
-            text-align: center;
         }
         .card {
             background: rgba(0, 20, 30, 0.7);
@@ -110,9 +108,7 @@
             color: rgba(255,255,255,0.5);
             cursor: pointer;
         }
-        .sound-hint:hover {
-            color: cyan;
-        }
+        .sound-hint:hover { color: cyan; }
     </style>
 </head>
 <body>
@@ -136,13 +132,8 @@
     const LOADING_VIDEO_URL = "https://j.top4top.io/m_3755mcrvl4.mp4";
     let soundEnabled = false;
 
-    // Fungsi untuk mengaktifkan suara (dipanggil user klik)
-    function enableSound() {
-        soundEnabled = true;
-        showToast("🔊 Suara diaktifkan! Login untuk mendengar musik loading.");
-    }
+    function enableSound() { soundEnabled = true; showToast("🔊 Suara diaktifkan!"); }
 
-    // Cek apakah user sudah pernah interaksi dengan halaman
     document.body.addEventListener('click', function enableSoundOnClick() {
         soundEnabled = true;
         document.body.removeEventListener('click', enableSoundOnClick);
@@ -151,10 +142,7 @@
 
     function loadUsers() {
         let raw = localStorage.getItem("nxt_core_users");
-        if (!raw) {
-            window.location.href = "manager.html";
-            return [];
-        }
+        if (!raw) { window.location.href = "manager.html"; return []; }
         return JSON.parse(raw);
     }
 
@@ -169,51 +157,32 @@
     function showLoadingVideo(callback) {
         let overlay = document.getElementById("loadingOverlay");
         let video = document.getElementById("loadingVideo");
-        
-        // Setel volume dan unmute kalau suara sudah diaktifkan
         video.volume = 0.7;
-        if (soundEnabled) {
-            video.muted = false;
-        } else {
-            video.muted = true;
-        }
-        
+        video.muted = !soundEnabled;
         overlay.style.display = "flex";
         video.src = LOADING_VIDEO_URL;
         video.load();
-        
         video.oncanplay = () => {
-            video.play().catch(e => console.log("play error:", e));
+            video.play().catch(e => console.log("play error"));
             let duration = video.duration || 3;
             setTimeout(callback, duration * 1000);
         };
-        video.onerror = () => {
-            setTimeout(callback, 2000);
-        };
+        video.onerror = () => setTimeout(callback, 2000);
     }
 
     function handleLogin() {
         let username = document.getElementById("loginUser").value.trim();
         let password = document.getElementById("loginPass").value.trim();
         let users = loadUsers();
-        
         if (users.length === 0) return;
-        
         let found = users.find(u => u.username === username && u.password === password);
-        if (!found) {
-            showToast("❌ Login gagal!", true);
-            return;
-        }
+        if (!found) { showToast("❌ Login gagal!", true); return; }
         localStorage.setItem("nxt_user", JSON.stringify(found));
-        showLoadingVideo(() => {
-            window.location.href = "dashboard.html";
-        });
+        showLoadingVideo(() => { window.location.href = "dashboard.html"; });
     }
 
     let session = localStorage.getItem("nxt_user");
-    if (session) {
-        window.location.href = "dashboard.html";
-    }
+    if (session) window.location.href = "dashboard.html";
 </script>
 </body>
 </html>
