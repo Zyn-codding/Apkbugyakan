@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>NXT CORE v2 | LOGIN</title>
     <style>
         * {
@@ -80,6 +80,7 @@
             border: 1px solid cyan;
             border-radius: 60px;
             color: white;
+            font-size: 16px;
         }
         button {
             width: 100%;
@@ -89,6 +90,7 @@
             border-radius: 60px;
             font-weight: bold;
             cursor: pointer;
+            font-size: 16px;
         }
         .toast {
             position: fixed;
@@ -101,6 +103,7 @@
             color: white;
             display: none;
             z-index: 999;
+            font-size: 14px;
         }
         .sound-hint {
             margin-top: 15px;
@@ -132,8 +135,12 @@
     const LOADING_VIDEO_URL = "https://j.top4top.io/m_3755mcrvl4.mp4";
     let soundEnabled = false;
 
-    function enableSound() { soundEnabled = true; showToast("🔊 Suara diaktifkan!"); }
+    function enableSound() { 
+        soundEnabled = true; 
+        showToast("🔊 Suara diaktifkan!"); 
+    }
 
+    // Aktifkan suara kalau user klik di mana saja
     document.body.addEventListener('click', function enableSoundOnClick() {
         soundEnabled = true;
         document.body.removeEventListener('click', enableSoundOnClick);
@@ -142,7 +149,10 @@
 
     function loadUsers() {
         let raw = localStorage.getItem("nxt_core_users");
-        if (!raw) { window.location.href = "manager.html"; return []; }
+        if (!raw) { 
+            window.location.href = "manager.html"; 
+            return []; 
+        }
         return JSON.parse(raw);
     }
 
@@ -157,32 +167,62 @@
     function showLoadingVideo(callback) {
         let overlay = document.getElementById("loadingOverlay");
         let video = document.getElementById("loadingVideo");
+        
         video.volume = 0.7;
         video.muted = !soundEnabled;
+        
         overlay.style.display = "flex";
         video.src = LOADING_VIDEO_URL;
         video.load();
+        
         video.oncanplay = () => {
-            video.play().catch(e => console.log("play error"));
+            video.play().catch(e => console.log("play error:", e));
             let duration = video.duration || 3;
-            setTimeout(callback, duration * 1000);
+            setTimeout(() => {
+                overlay.style.display = "none";
+                if (callback) callback();
+            }, duration * 1000);
         };
-        video.onerror = () => setTimeout(callback, 2000);
+        
+        video.onerror = () => {
+            setTimeout(() => {
+                overlay.style.display = "none";
+                if (callback) callback();
+            }, 2000);
+        };
     }
 
     function handleLogin() {
         let username = document.getElementById("loginUser").value.trim();
         let password = document.getElementById("loginPass").value.trim();
+        
+        if (!username || !password) {
+            showToast("❌ Isi username dan password!", true);
+            return;
+        }
+        
         let users = loadUsers();
         if (users.length === 0) return;
+        
         let found = users.find(u => u.username === username && u.password === password);
-        if (!found) { showToast("❌ Login gagal!", true); return; }
+        
+        if (!found) {
+            showToast("❌ Username atau password salah!", true);
+            return;
+        }
+        
         localStorage.setItem("nxt_user", JSON.stringify(found));
-        showLoadingVideo(() => { window.location.href = "dashboard.html"; });
+        
+        showLoadingVideo(() => {
+            window.location.href = "dashboard.html";
+        });
     }
 
+    // Cek apakah sudah login
     let session = localStorage.getItem("nxt_user");
-    if (session) window.location.href = "dashboard.html";
+    if (session) {
+        window.location.href = "dashboard.html";
+    }
 </script>
 </body>
 </html>
